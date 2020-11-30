@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 import SlicesContainer from './SlicesContainer';
 import DiagnosticPlotsContainer from './DiagnosticPlotsContainer';
+import { channels } from '../shared/constants';
+const { ipcRenderer } = window; 
 
 
 export default class App extends Component {
@@ -13,6 +15,11 @@ export default class App extends Component {
     // global state variables and funcions that get passed between components
     // --------------------------------------------------------
     this.state = {
+
+      // Electron
+      appName: '',
+      appVersion: '',
+
       // Horizontal
       currentSliceType: 'HORIZONTAL',
       currentAltitude: 1200,
@@ -31,7 +38,15 @@ export default class App extends Component {
     this.handleSelectTab          = this.handleSelectTab.bind(this);
     this.handleUpdateVerticalX    = this.handleUpdateVerticalX.bind(this);
     this.handleUpdateVerticalY    = this.handleUpdateVerticalY.bind(this);
-    this.handleToggleVerticalAxis = this.handleToggleVerticalAxis.bind(this)
+    this.handleToggleVerticalAxis = this.handleToggleVerticalAxis.bind(this);
+
+    // ELECTRON
+    ipcRenderer.send(channels.APP_INFO);
+    ipcRenderer.on(channels.APP_INFO, (event, arg) => {
+      ipcRenderer.removeAllListeners(channels.APP_INFO);
+      const { appName, appVersion } = arg;
+      this.setState({ appName, appVersion });
+    });
 
   }
 
