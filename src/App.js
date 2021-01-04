@@ -3,6 +3,15 @@ import './App.css';
 import SlicesContainer from './SlicesContainer';
 import DiagnosticPlotsContainer from './DiagnosticPlotsContainer';
 
+// DiagnosticPlotsContainer data: BOMEX_1_DEFAULT data load
+import bomex_1_default from './data/BOMEX_1_DEFAULT.json';
+import bomex_2_default from './data/BOMEX_2_DEFAULT.json';
+
+// SlicesContainer data
+import BOMEX_AUX_DATA from './data/BOMEX_3D_aux_100-104'
+import BOMEX_DATA from './data/BOMEX_3D_100-104'
+import BOMEX_coords from './data/BOMEX_3D_coord_data';
+
 
 export default class App extends Component {
 
@@ -35,6 +44,9 @@ export default class App extends Component {
 
   }
 
+  // DiagnosticPlotsContainer
+  datasets = [bomex_1_default, bomex_2_default];
+
   // --------------------------------------------------------
   handleSelectTab(tabType) {
     if (tabType !== this.state.currentSliceType) {
@@ -46,7 +58,6 @@ export default class App extends Component {
 
   // --------------------------------------------------------
   handleUpdateAltitude = (e) => {
-    console.log('updating altitude:');
     this.setState({ currentAltitude: e.target.value });
   };
 
@@ -68,10 +79,16 @@ export default class App extends Component {
   // --------------------------------------------------------
   // overall app structure
   // --------------------------------------------------------
+  
   render() {
     return (
       <div className="App">
         <SlicesContainer
+
+          BOMEX_AUX_DATA={ BOMEX_AUX_DATA }
+          BOMEX_DATA={ BOMEX_DATA }
+          BOMEX_coords={ BOMEX_coords }
+
           horizontalSliceRange={ this.state.horizontalSliceRange }
           horizontalIncrement={ this.state.horizontalIncrement }
           verticalSliceRange={ this.state.verticalSliceRange }
@@ -91,6 +108,7 @@ export default class App extends Component {
 
         />
         <DiagnosticPlotsContainer
+          datasets={ this.datasets }
           currentAltitude={ this.state.currentAltitude }
         />
       </div>
