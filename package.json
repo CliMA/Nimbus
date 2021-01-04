@@ -42,6 +42,9 @@
       "build/**/*",
       "node_modules/**/*"
     ],
+    "directories":{
+      "buildResources": "assets"
+    },
     "electronVersion": "4.2.8",
     "publish": {
       "provider": "github",
