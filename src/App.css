@@ -16,6 +16,79 @@ html, body {
   font-weight: 300;
 }
 
+#data-selection-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#data-viewer-header {
+  background: var(--header-black);
+	height: 4.0vh;
+	color: white;
+	display: flex;
+	align-items: center;
+	padding: 0px 20px;
+}
+
+#available-datasets {
+	background: #dedede;
+	height: 4.0vh;
+	display: flex;
+	align-items: center;
+	padding: 0px 20px;
+}
+
+#sites-list, .site-datasets-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.site-container {
+  border-bottom: 1px solid black;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-header {
+  height: 4.0vh;
+  display: flex;
+  align-items: center;
+  padding: 0px 20px;
+  background: #efefef;
+}
+
+#data-viewer-container {
+  height: 96vh;
+  display: flex;
+  /* background: var(--bg-dark); */
+}
+
+#dataset-list-view {
+  width: 30vw;
+  border-right: 1px solid black;
+  /* background: var(--header-section-blue); */
+}
+
+.dataset-item-container {
+  padding: 20px;
+	display: flex;
+	align-items: center;
+  justify-content: space-evenly;
+  border-bottom: 1px solid gray;
+}
+
+#map-view {
+  width: 70vw;
+  /* background: var(--bg-dark); */
+}
+
+
+
+
+
+
+
 #app-header {
   color: white;
   padding: 0px 20px;

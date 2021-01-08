@@ -1,117 +1,145 @@
 import React, { Component } from 'react';
 import './App.css';
-import SlicesContainer from './SlicesContainer';
-import DiagnosticPlotsContainer from './DiagnosticPlotsContainer';
-
-// DiagnosticPlotsContainer data: BOMEX_1_DEFAULT data load
-import bomex_1_default from './data/BOMEX_1_DEFAULT.json';
-import bomex_2_default from './data/BOMEX_2_DEFAULT.json';
-
-// SlicesContainer data
-import BOMEX_AUX_DATA from './data/BOMEX_3D_aux_100-104'
-import BOMEX_DATA from './data/BOMEX_3D_100-104'
-import BOMEX_coords from './data/BOMEX_3D_coord_data';
-
+import Viewer from './Viewer';
 
 export default class App extends Component {
-
   constructor(props) {
     super(props);
 
-    // --------------------------------------------------------
-    // global state variables and funcions that get passed between components
-    // --------------------------------------------------------
     this.state = {
-      // Horizontal
-      currentSliceType: 'HORIZONTAL',
-      currentAltitude: 1200,
-      horizontalSliceRange: [0, 3000],
-      horizontalIncrement: 40,
-
-      // Vertical
-      currentVerticalAxis: 'X',
-      currentVerticalX: 3000,
-      currentVerticalY: 3000,
-      verticalSliceRange: [0, 6400],
-      verticalIncrement: 100,
+      selectedDatasets: [],
+      hasLaunched: false
     }
-
-    this.handleUpdateAltitude     = this.handleUpdateAltitude.bind(this);
-    this.handleSelectTab          = this.handleSelectTab.bind(this);
-    this.handleUpdateVerticalX    = this.handleUpdateVerticalX.bind(this);
-    this.handleUpdateVerticalY    = this.handleUpdateVerticalY.bind(this);
-    this.handleToggleVerticalAxis = this.handleToggleVerticalAxis.bind(this)
-
   }
 
-  // DiagnosticPlotsContainer
-  datasets = [bomex_1_default, bomex_2_default];
-
-  // --------------------------------------------------------
-  handleSelectTab(tabType) {
-    if (tabType !== this.state.currentSliceType) {
-      this.setState({
-        currentSliceType: tabType
-      });
+  sampleData = {
+    simulation_01: {
+      dimensions: {
+        units: 'km',
+        width: 6.4,
+        height: 3.0,
+        depth: 6.4
+      },
+      duration: {
+        hrs: 6,
+        min: 0,
+        sec: 0
+      },
+      timesteps: 180
     }
   }
 
   // --------------------------------------------------------
-  handleUpdateAltitude = (e) => {
-    this.setState({ currentAltitude: e.target.value });
-  };
-
-  // --------------------------------------------------------
-  handleUpdateVerticalX = (e) => {
-    this.setState({ currentVerticalX: e.target.value });
-  };
-
-  // --------------------------------------------------------
-  handleUpdateVerticalY = (e) => {
-    this.setState({ currentVerticalY: e.target.value });
-  };
-
-  // --------------------------------------------------------
-  handleToggleVerticalAxis = (axis) => {
-    this.setState({ currentVerticalAxis: axis });
-  }
-
-  // --------------------------------------------------------
-  // overall app structure
-  // --------------------------------------------------------
-  
   render() {
     return (
-      <div className="App">
-        <SlicesContainer
+      <>
+        {
+          this.state.hasLaunched ? <Viewer /> : 
+          <div id='data-selection-container'>
+            <div id='data-viewer-header'>
+              <span>NIMBUS</span>
+            </div>
+            <div id='data-viewer-container'>
+              <div id='dataset-list-view'>
 
-          BOMEX_AUX_DATA={ BOMEX_AUX_DATA }
-          BOMEX_DATA={ BOMEX_DATA }
-          BOMEX_coords={ BOMEX_coords }
+                <div id='available-datasets'>
+                  <span>Available Datasets ({ this.state.selectedDatasets.length } selected) </span>
+                </div>
 
-          horizontalSliceRange={ this.state.horizontalSliceRange }
-          horizontalIncrement={ this.state.horizontalIncrement }
-          verticalSliceRange={ this.state.verticalSliceRange }
-          verticalIncrement={ this.state.verticalIncrement }
+                <div>
+                  <ul id='sites-list'>
+                    {/* site 01 */}
+                    <li className='site-list-item'>
+                      <div className='site-container expanded'>
+                        <div className='site-header'>
+                          <span>Site 01</span>
+                        </div>
+                        <div className='site-datasets-container'>
+                          <ul className='site-datasets-list'>
+                           
+                            <li className='site-dataset-item'>
+                              <div className='dataset-item-container'>
+                                <div>
+                                  <span className='simulation-id-label'>simulation_01</span>
+                                </div>
+                                <div className='simulation-meta'>
+                                  domain dimensions: 6.4km x 6.4km x 3.0km<br/>
+                                  duration (h/m/s): 06:00:00<br/>
+                                  time steps: 180
+                                </div>
+                              </div>
+                            </li>
 
-          currentSliceType={ this.state.currentSliceType }
-          currentAltitude={ this.state.currentAltitude }
-          currentVerticalAxis={ this.state.currentVerticalAxis }
-          currentVerticalX={ this.state.currentVerticalX }
-          currentVerticalY={ this.state.currentVerticalY }
+                            <li className='site-dataset-item'>
+                              <div className='dataset-item-container'>
+                                <div>
+                                  <span className='simulation-id-label'>simulation_01</span>
+                                </div>
+                                <div className='simulation-meta'>
+                                  domain dimensions: 6.4km x 6.4km x 3.0km<br/>
+                                  duration (h/m/s): 06:00:00<br/>
+                                  time steps: 180
+                                </div>
+                              </div>
+                            </li>
 
-          handleSelectTab={ this.handleSelectTab }
-          handleUpdateAltitude={ this.handleUpdateAltitude }
-          handleUpdateVerticalX={ this.handleUpdateVerticalX }
-          handleUpdateVerticalY={ this.handleUpdateVerticalY }
-          handleToggleVerticalAxis={ this.handleToggleVerticalAxis }
+                            <li className='site-dataset-item'>
+                              <div className='dataset-item-container'>
+                                <div>
+                                  <span className='simulation-id-label'>simulation_01</span>
+                                </div>
+                                <div className='simulation-meta'>
+                                  domain dimensions: 6.4km x 6.4km x 3.0km<br/>
+                                  duration (h/m/s): 06:00:00<br/>
+                                  time steps: 180
+                                </div>
+                              </div>
+                            </li>
 
-        />
-        <DiagnosticPlotsContainer
-          datasets={ this.datasets }
-          currentAltitude={ this.state.currentAltitude }
-        />
-      </div>
-    );
+                          </ul>
+                        </div>
+                        
+                      </div>
+                    </li>
+
+                    {/* site 02 */}
+
+                    <li className='site-list-item'>
+                      <div className='site-container'>
+                        <div className='site-header'>
+                          <span>Site 02</span>
+                        </div>
+                        <div className='site-datasets-container'>
+                          <ul className='site-datasets-list'>
+                           
+                            <li className='site-dataset-item'>
+                              <div className='dataset-item-container'>
+                                <div>
+                                  <span className='simulation-id-label'>simulation_01</span>
+                                </div>
+                                <div className='simulation-meta'>
+                                  domain dimensions: 6.4km x 6.4km x 3.0km<br/>
+                                  duration (h/m/s): 06:00:00<br/>
+                                  time steps: 180
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                        
+                      </div>
+                    </li>
+
+                   
+                  </ul>
+                </div>
+                
+              </div>
+              <div id='map-view'></div>
+            </div>
+          </div> 
+        }
+      </>
+    )
   }
 }
