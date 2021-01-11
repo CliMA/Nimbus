@@ -107,9 +107,23 @@ export default class App extends Component {
 
   // --------------------------------------------------------
   selectSimulationDataset(simdata) {
-    this.setState({ 
-      selectedDatasets: [...this.state.selectedDatasets, simdata] 
-    })
+    
+    // This could probably be more efficient
+    let idx = this.state.selectedDatasets.findIndex(data => data['selection_id'] === simdata['selection_id']);
+
+    if (idx === -1) {
+      // not found, add it
+      this.setState({ 
+        selectedDatasets: [...this.state.selectedDatasets, simdata] 
+      })
+    } else {
+      // nothing found so we add it
+      let updatedSelection = this.state.selectedDatasets;
+      updatedSelection.splice(idx, 1);
+      this.setState({
+        selectedDatasets: updatedSelection
+      });
+    }
   }
 
   // --------------------------------------------------------
@@ -119,7 +133,6 @@ export default class App extends Component {
 
   // --------------------------------------------------------
   render() {
-    console.log('selectedDatasets:', this.state.selectedDatasets);
     return (
       <>
         {

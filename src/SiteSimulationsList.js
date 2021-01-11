@@ -24,7 +24,6 @@ export default class SiteSimulationsList extends Component {
         <SiteSimulationsListItem
           selectSimulationDataset={ this.props.selectSimulationDataset } 
           key={ `${ this.props.siteData['site_id'] }-${ simData.sim_id }-${ idx }` }
-          idx={ idx }
           simData={ simData }
           site_id={ this.props.siteData['site_id'] }
         />

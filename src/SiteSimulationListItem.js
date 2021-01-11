@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-export default function SiteSimulationsListItem({ selectSimulationDataset, idx, simData, site_id }) {
+export default function SiteSimulationsListItem({ selectSimulationDataset, simData, site_id }) {
 
   const [isChecked, setIsChecked] = useState(false)
 
   // --------------------------------------------------------
   function handleChecked(data) {
     setIsChecked(!isChecked);
-    selectSimulationDataset(data);
+    selectSimulationDataset(data)
   }
 
   // --------------------------------------------------------
@@ -17,18 +17,19 @@ export default function SiteSimulationsListItem({ selectSimulationDataset, idx, 
         <div>
           <input 
             type="checkbox" 
-            id={ `${site_id}-${simData.sim_id}-${idx}` }
-            name={ `${site_id}-${simData.sim_id}-${idx}` } 
-            value={ `${site_id}-${simData.sim_id}-${idx}` } 
+            id={ `${site_id}-${simData.sim_id}` }
+            name={ `${site_id}-${simData.sim_id}` } 
+            value={ `${site_id}-${simData.sim_id}` } 
             checked={ isChecked } 
             onChange={ () => handleChecked({
+              selection_id: `${site_id}-${simData.sim_id}`,
               site_id: site_id,
               sim_id: simData['sim_id']
             }) }
           />
           <label 
             className='simulation-id-label' 
-            htmlFor={ `${site_id}-${simData.sim_id}-${idx}` }
+            htmlFor={ `${site_id}-${simData.sim_id}` }
           >{ simData['sim_id'] }</label>
         </div>
         <div className='simulation-meta'>
