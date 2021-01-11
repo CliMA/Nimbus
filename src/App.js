@@ -167,7 +167,7 @@ export default class App extends Component {
 
                   </ul>
                 </div>
-                <button>Launch</button>
+                <button id='btn-launch' disabled={ this.state.selectedDatasets.length > 0 ? false : true }>Launch</button>
               </div>
               <div id='map-view'></div>
             </div>
