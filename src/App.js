@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import Viewer from './Viewer';
+import SiteSimulationsList from './SiteSimulationsList';
 
 export default class App extends Component {
   constructor(props) {
@@ -12,25 +13,113 @@ export default class App extends Component {
     }
   }
 
-  sampleData = {
-    simulation_01: {
-      dimensions: {
-        units: 'km',
-        width: 6.4,
-        height: 3.0,
-        depth: 6.4
+  // SAMPLE DATA
+  site_01_data = {
+    site_id: 'site_01',
+    geocoordinates: [],
+    simulations: [
+      {
+        sim_id: 'simulation_01',
+        domain_dims: {
+          units: 'km',
+          width: 6.4,
+          depth: 6.4,
+          height: 3.0
+        },
+        duration: {
+          hrs: 6,
+          min: 0,
+          sec: 0
+        },
+        time_steps: 180
       },
-      duration: {
-        hrs: 6,
-        min: 0,
-        sec: 0
+      {
+        sim_id: 'simulation_02',
+        domain_dims: {
+          units: 'km',
+          width: 6.4,
+          depth: 6.4,
+          height: 3.0
+        },
+        duration: {
+          hrs: 4,
+          min: 30,
+          sec: 30
+        },
+        time_steps: 40
       },
-      timesteps: 180
-    }
+      {
+        sim_id: 'simulation_03',
+        domain_dims: {
+          units: 'km',
+          width: 6.4,
+          depth: 6.4,
+          height: 3.0
+        },
+        duration: {
+          hrs: 5,
+          min: 45,
+          sec: 0
+        },
+        time_steps: 60
+      }
+    ]
+  };
+
+
+  site_02_data = {
+    site_id: 'site_02',
+    geocoordinates: [],
+    simulations: [
+      {
+        sim_id: 'simulation_04',
+        domain_dims: {
+          units: 'km',
+          width: 6.4,
+          depth: 6.4,
+          height: 3.0
+        },
+        duration: {
+          hrs: 6,
+          min: 0,
+          sec: 0
+        },
+        time_steps: 180
+      },
+      {
+        sim_id: 'simulation_05',
+        domain_dims: {
+          units: 'km',
+          width: 6.4,
+          depth: 6.4,
+          height: 3.0
+        },
+        duration: {
+          hrs: 4,
+          min: 30,
+          sec: 30
+        },
+        time_steps: 40
+      },
+    ]
+  };
+
+
+  // --------------------------------------------------------
+  selectSimulationDataset(simdata) {
+    this.setState({ 
+      selectedDatasets: [...this.state.selectedDatasets, simdata] 
+    })
+  }
+
+  // --------------------------------------------------------
+  generateSiteSimulationList() {
+
   }
 
   // --------------------------------------------------------
   render() {
+    console.log('selectedDatasets:', this.state.selectedDatasets);
     return (
       <>
         {
@@ -48,92 +137,24 @@ export default class App extends Component {
 
                 <div>
                   <ul id='sites-list'>
-                    {/* site 01 */}
+              
                     <li className='site-list-item'>
-                      <div className='site-container expanded'>
-                        <div className='site-header'>
-                          <span>Site 01</span>
-                        </div>
-                        <div className='site-datasets-container'>
-                          <ul className='site-datasets-list'>
-                           
-                            <li className='site-dataset-item'>
-                              <div className='dataset-item-container'>
-                                <div>
-                                  <span className='simulation-id-label'>simulation_01</span>
-                                </div>
-                                <div className='simulation-meta'>
-                                  domain dimensions: 6.4km x 6.4km x 3.0km<br/>
-                                  duration (h/m/s): 06:00:00<br/>
-                                  time steps: 180
-                                </div>
-                              </div>
-                            </li>
-
-                            <li className='site-dataset-item'>
-                              <div className='dataset-item-container'>
-                                <div>
-                                  <span className='simulation-id-label'>simulation_01</span>
-                                </div>
-                                <div className='simulation-meta'>
-                                  domain dimensions: 6.4km x 6.4km x 3.0km<br/>
-                                  duration (h/m/s): 06:00:00<br/>
-                                  time steps: 180
-                                </div>
-                              </div>
-                            </li>
-
-                            <li className='site-dataset-item'>
-                              <div className='dataset-item-container'>
-                                <div>
-                                  <span className='simulation-id-label'>simulation_01</span>
-                                </div>
-                                <div className='simulation-meta'>
-                                  domain dimensions: 6.4km x 6.4km x 3.0km<br/>
-                                  duration (h/m/s): 06:00:00<br/>
-                                  time steps: 180
-                                </div>
-                              </div>
-                            </li>
-
-                          </ul>
-                        </div>
-                        
-                      </div>
+                      <SiteSimulationsList 
+                        selectSimulationDataset={ this.selectSimulationDataset.bind(this) }
+                        siteData={ this.site_01_data } 
+                      />
                     </li>
 
-                    {/* site 02 */}
-
                     <li className='site-list-item'>
-                      <div className='site-container'>
-                        <div className='site-header'>
-                          <span>Site 02</span>
-                        </div>
-                        <div className='site-datasets-container'>
-                          <ul className='site-datasets-list'>
-                           
-                            <li className='site-dataset-item'>
-                              <div className='dataset-item-container'>
-                                <div>
-                                  <span className='simulation-id-label'>simulation_01</span>
-                                </div>
-                                <div className='simulation-meta'>
-                                  domain dimensions: 6.4km x 6.4km x 3.0km<br/>
-                                  duration (h/m/s): 06:00:00<br/>
-                                  time steps: 180
-                                </div>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                        
-                      </div>
+                      <SiteSimulationsList
+                        selectSimulationDataset={ this.selectSimulationDataset.bind(this) } 
+                        siteData={ this.site_02_data }
+                      />
                     </li>
 
-                   
                   </ul>
                 </div>
-                
+                <button>Launch</button>
               </div>
               <div id='map-view'></div>
             </div>
