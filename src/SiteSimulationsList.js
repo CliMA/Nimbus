@@ -34,9 +34,20 @@ export default class SiteSimulationsList extends Component {
   // --------------------------------------------------------
   render() {
     return (
-      <div className='site-container expanded'>
+      <div className='site-container'>
         <div className='site-header'>
           <span>Site 01</span>
+
+          { this.state.isExpanded ? 
+            <svg width="18" height="1" viewBox="0 0 18 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line y1="0.5" x2="18" y2="0.5" stroke="black"/>
+            </svg>
+            :
+            <svg class='icon-expand' width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 0C8.71596 0 8.48571 0.230271 8.48571 0.514286V8.48575H0.514286C0.230246 8.48575 0 8.71599 0 9.00003C0 9.28407 0.230246 9.51432 0.514286 9.51432H8.48571V17.4857C8.48571 17.7698 8.71596 18 9 18C9.28404 18 9.51429 17.7698 9.51429 17.4857V9.51432H17.4857C17.7698 9.51432 18 9.28407 18 9.00003C18 8.71599 17.7698 8.48575 17.4857 8.48575H9.51429V0.514286C9.51429 0.230271 9.28404 0 9 0Z" fill="black"/>
+            </svg>
+          }
+        
         </div>
         <div className='site-datasets-container'>
           <ul className='site-datasets-list'>
