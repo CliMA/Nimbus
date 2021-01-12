@@ -22,7 +22,8 @@
     "ebuild": "npm run build && node_modules/.bin/build",
     "start": "react-scripts start",
     "build": "react-scripts --max_old_space_size=4096 build",
-    "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\""
+    "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "server": "nodemon server.js"
   },
   "eslintConfig": {
     "extends": "react-app"

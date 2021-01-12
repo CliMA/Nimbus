@@ -17,8 +17,20 @@ export default class App extends Component {
     }
   }
 
+
   // --------------------------------------------------------
   componentDidMount() {
+
+    axios.get('/siteSimulationList')
+      .then(res => {
+        this.setState({
+          simulationData: res.data
+        });
+      }).catch(e => {
+        console.log('/simulationData error: ', e);
+      });
+
+
     axios.get('/userDirectoryPath')
       .then(res => {
         this.setState({ 
@@ -27,98 +39,19 @@ export default class App extends Component {
       });
   }
 
-
   // --------------------------------------------------------
-  // SAMPLE DATA
-  site_01_data = {
-    site_id: 'site_01',
-    geocoordinates: [],
-    simulations: [
-      {
-        sim_id: 'simulation_01',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 6,
-          min: 0,
-          sec: 0
-        },
-        time_steps: 180
-      },
-      {
-        sim_id: 'simulation_02',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 4,
-          min: 30,
-          sec: 30
-        },
-        time_steps: 40
-      },
-      {
-        sim_id: 'simulation_03',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 5,
-          min: 45,
-          sec: 0
-        },
-        time_steps: 60
-      }
-    ]
-  };
-
-
-  site_02_data = {
-    site_id: 'site_02',
-    geocoordinates: [],
-    simulations: [
-      {
-        sim_id: 'simulation_04',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 6,
-          min: 0,
-          sec: 0
-        },
-        time_steps: 180
-      },
-      {
-        sim_id: 'simulation_05',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 4,
-          min: 30,
-          sec: 30
-        },
-        time_steps: 40
-      },
-    ]
-  };
+  generateSiteSimulationsList() {
+    return this.state.simulationData.map(simdata => {
+      return (
+        <li className='site-list-item' key={ simdata.site_id }>
+          <SiteSimulationsList 
+            selectSimulationDataset={ this.selectSimulationDataset.bind(this) }
+            siteData={ simdata } 
+          />
+        </li>
+      );
+    })
+  }
 
 
   // --------------------------------------------------------
@@ -140,11 +73,6 @@ export default class App extends Component {
         selectedDatasets: updatedSelection
       });
     }
-  }
-
-  // --------------------------------------------------------
-  generateSiteSimulationList() {
-
   }
 
   // --------------------------------------------------------
@@ -183,21 +111,9 @@ export default class App extends Component {
 
                 <div>
                   <ul id='sites-list'>
-              
-                    <li className='site-list-item'>
-                      <SiteSimulationsList 
-                        selectSimulationDataset={ this.selectSimulationDataset.bind(this) }
-                        siteData={ this.site_01_data } 
-                      />
-                    </li>
-
-                    <li className='site-list-item'>
-                      <SiteSimulationsList
-                        selectSimulationDataset={ this.selectSimulationDataset.bind(this) } 
-                        siteData={ this.site_02_data }
-                      />
-                    </li>
-
+                    { 
+                      this.state.simulationData ? this.generateSiteSimulationsList() : null
+                    }
                   </ul>
                 </div>
                 <button id='btn-launch' disabled={ this.state.selectedDatasets.length > 0 ? false : true }>Launch</button>
