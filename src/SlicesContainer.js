@@ -5,11 +5,6 @@ import TimelineScrubber from './TimelineScrubber';
 import BoxController from './BoxController'
 import * as d3 from 'd3';
 
-import BOMEX_AUX_DATA from './data/BOMEX_3D_aux_100-104'
-import BOMEX_DATA from './data/BOMEX_3D_100-104'
-
-import BOMEX_coords from './data/BOMEX_3D_coord_data';
-
 export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
@@ -21,24 +16,24 @@ export default class SlicesContainer extends Component {
   start_time_stamp = 100
 
   boxes = {
-    "moisture.ρq_tot"     : BOMEX_DATA["moisture.ρq_tot"],
-    "ρu[1]"               : BOMEX_DATA["ρu[1]"],
-    "ρu[2]"               : BOMEX_DATA["ρu[2]"],
-    "ρu[3]"               : BOMEX_DATA["ρu[3]"],
-    "ρ"                   : BOMEX_DATA["ρ"],
-    "ρe"                  : BOMEX_DATA["ρe"],
-    "moisture.q_liq"      : BOMEX_AUX_DATA["moisture.q_liq"],
-    "moisture.temperature": BOMEX_AUX_DATA["moisture.temperature"],
-    "moisture.θ_v"        : BOMEX_AUX_DATA["moisture.θ_v"]
+    "moisture.ρq_tot"     : this.props.BOMEX_DATA["moisture.ρq_tot"],
+    "ρu[1]"               : this.props.BOMEX_DATA["ρu[1]"],
+    "ρu[2]"               : this.props.BOMEX_DATA["ρu[2]"],
+    "ρu[3]"               : this.props.BOMEX_DATA["ρu[3]"],
+    "ρ"                   : this.props.BOMEX_DATA["ρ"],
+    "ρe"                  : this.props.BOMEX_DATA["ρe"],
+    "moisture.q_liq"      : this.props.BOMEX_AUX_DATA["moisture.q_liq"],
+    "moisture.temperature": this.props.BOMEX_AUX_DATA["moisture.temperature"],
+    "moisture.θ_v"        : this.props.BOMEX_AUX_DATA["moisture.θ_v"]
   }
 
   // --------------------------------------------------------
   // Dictionaries for variable queries
   // --------------------------------------------------------
   dims = {
-    "x" : BOMEX_coords.x[0],
-    "y" : BOMEX_coords.y[0],
-    "z" : BOMEX_coords.z[0]
+    "x" : this.props.BOMEX_coords.x[0],
+    "y" : this.props.BOMEX_coords.y[0],
+    "z" : this.props.BOMEX_coords.z[0]
   };
 
   contour_var_opts = [

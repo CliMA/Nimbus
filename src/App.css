@@ -16,6 +16,128 @@ html, body {
   font-weight: 300;
 }
 
+#data-selection-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#data-viewer-header {
+  background: var(--header-black);
+	height: 4.0vh;
+	color: white;
+	display: flex;
+	align-items: center;
+	padding: 0px 20px;
+}
+
+#available-datasets {
+	background: #dedede;
+	height: 4.0vh;
+	display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 20px;
+  padding-right: 16px;
+}
+
+#icon-user-settings:hover {
+  cursor: pointer;
+}
+
+#sites-list, .site-datasets-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.site-datasets-container {
+  display: none;
+}
+
+.site-datasets-container.expanded {
+  display: block;
+}
+
+.site-container {
+  border-bottom: 1px solid black;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-container.expanded {
+  border-bottom: none;
+}
+
+.site-header {
+  height: 4.0vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 20px;
+  background: #efefef;
+}
+
+
+#data-viewer-container {
+  height: 96vh;
+  display: flex;
+  /* background: var(--bg-dark); */
+}
+
+#dataset-list-view {
+  position: relative;
+  width: 30vw;
+  border-right: 1px solid black;
+  /* background: var(--header-section-blue); */
+}
+
+#btn-launch {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.dataset-item-container {
+  padding: 20px;
+	display: flex;
+	align-items: center;
+  justify-content: space-evenly;
+  border-bottom: 1px solid gray;
+}
+
+.icon-expand:hover, 
+.icon-collapse:hover {
+  cursor: pointer;
+}
+
+#map-view {
+  width: 70vw;
+  /* background: var(--bg-dark); */
+}
+
+#user-settings-modal {
+  position: absolute;
+	z-index: 999;
+	width: 60vw;
+	height: 40vh;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	background: #d6d6d6;
+  border-radius: 5px;
+  display: none;
+}
+
+#user-settings-modal.visible {
+  display: block;
+}
+
+
+
+
+
+
+
 #app-header {
   color: white;
   padding: 0px 20px;
