@@ -5,16 +5,19 @@
   "homepage": "./",
   "main": "./electron/main.js",
   "dependencies": {
+    "axios": "^0.21.1",
     "concurrently": "^5.2.0",
     "d3": "^5.16.0",
     "electron": "^9.1.1",
     "electron-builder": "^22.8.0",
     "electron-is-dev": "^1.2.0",
+    "express": "^4.17.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "wait-on": "^5.1.0"
   },
+  "proxy": "http://localhost:8080",
   "scripts": {
     "ebuild": "npm run build && node_modules/.bin/build",
     "start": "react-scripts start",

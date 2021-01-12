@@ -34,8 +34,14 @@ html, body {
 	background: #dedede;
 	height: 4.0vh;
 	display: flex;
-	align-items: center;
-	padding: 0px 20px;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 20px;
+  padding-right: 16px;
+}
+
+#icon-user-settings:hover {
+  cursor: pointer;
 }
 
 #sites-list, .site-datasets-list {
@@ -107,6 +113,23 @@ html, body {
 #map-view {
   width: 70vw;
   /* background: var(--bg-dark); */
+}
+
+#user-settings-modal {
+  position: absolute;
+	z-index: 999;
+	width: 60vw;
+	height: 40vh;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	background: #d6d6d6;
+  border-radius: 5px;
+  display: none;
+}
+
+#user-settings-modal.visible {
+  display: block;
 }
 
 
