@@ -3,3 +3,4 @@ node_modules/
 /build
 /dist
 user-settings.json
+*.nc
