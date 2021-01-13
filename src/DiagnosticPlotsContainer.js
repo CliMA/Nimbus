@@ -5,10 +5,6 @@ import AltVariableScrubber from './AltVariableScrubber';
 import Switch from './Switch';
 import Dropdown from './Dropdown';
 
-// BOMEX_1_DEFAULT data load
-import bomex_1_default from './data/BOMEX_1_DEFAULT.json';
-import bomex_2_default from './data/BOMEX_2_DEFAULT.json';
-
 export default class DiagnosticPlotsContainer extends React.Component {
 
   // --------------------------------------------------------
@@ -140,8 +136,6 @@ export default class DiagnosticPlotsContainer extends React.Component {
     "cov_qt_thl"
   ]
 
-  datasets = [bomex_1_default, bomex_2_default];
-
   // --------------------------------------------------------
   handleChangeDropdownVar = item => {
     this.setState({
@@ -257,7 +251,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               customRange={ this.state.custom_range }
               defaultVars={ this.default_vars1 }
               defaultVar={ this.default_vars1[5] }
-              data={ this.datasets }
+              data={ this.props.datasets }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -265,7 +259,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               customRange={ this.state.custom_range }
               defaultVars={ this.default_vars2 }
               defaultVar={ this.default_vars2[9] }
-              data={ this.datasets }
+              data={ this.props.datasets }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -273,7 +267,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               customRange={ this.state.custom_range }
               defaultVars={ this.default_vars3 }
               defaultVar={ this.default_vars3[3] }
-              data={ this.datasets }
+              data={ this.props.datasets }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -281,7 +275,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               customRange={ this.state.custom_range }
               defaultVars={ this.default_vars4 }
               defaultVar={ this.default_vars4[0] }
-              data={ this.datasets }
+              data={ this.props.datasets }
             />
           </div>
         </div>
@@ -290,7 +284,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
             currentAltVar={ this.state.currentAltVar }
             handleUpdateInterval={ this.handleUpdateInterval }
             customRange={ this.state.custom_range }
-            data={ this.datasets }
+            data={ this.props.datasets }
           />
         </div>
       </div>

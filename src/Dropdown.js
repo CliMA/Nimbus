@@ -36,14 +36,14 @@ function Dropdown({ default_var, items, onChange }) {
         open && (
           <ul className='dropdown-list'>
             { items.map( (item, idx) => (
-                <li className='dropdown-item' key={`${item}-${idx}`}>
-                  <button
-                    className='dropdown-item-btn'
-                    type='button'
-                    onClick={ () => handleOnClick(item) }>
-                      <span>{ item }</span>
-                  </button>
-                </li>
+              <li className='dropdown-item' key={`${item}-${idx}`}>
+                <button
+                  className='dropdown-item-btn'
+                  type='button'
+                  onClick={ () => handleOnClick(item) }>
+                    <span>{ item }</span>
+                </button>
+              </li>
             ))}
           </ul>
         )

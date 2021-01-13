@@ -32,7 +32,9 @@ Make sure you have installed Node & NPM. One way to do this is with [Homebrew](h
 
 Clone the repo, cd into the directory, and then run `npm install` to install the required dependencies for the project.
 
-Next, run `npm run start` in terminal and open a browser to `localhost:3000`. To run this with a development build for Electron, you can run `npm run dev` and that will launch both the dev server on `localhost:3000` as well as the Electron application.
+In a terminal window, run `node server.js` to start the server (running on port  `8080`).
+
+In another terminal winow, run `npm run start` and open a browser to `localhost:3000`. To run this with a development build for Electron, you can run `npm run dev` and that will launch both the dev server on `localhost:3000` as well as the Electron application.
 
 
 ## App Structure
