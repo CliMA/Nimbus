@@ -1,2 +1,3 @@
 node_modules/
-*.nc
+netcdf2nimbus/_input/*
+netcdf2nimbus/_output/*
