@@ -10,9 +10,6 @@ function get_args()
         "-i", "--input"
             help = "directory for input data"
             required = true
-        "-o", "--output"
-            help = "directory for output file"
-            required = true
 		"-s", "--site_num"
 			help = "ID number of site"
 			required = true
@@ -100,7 +97,7 @@ function get_diagnostic_data(file_core, file_default)
     return diag_data
 end
 
-function get_meta_data(core, default, aux, state)
+function get_meta_data(parsed_args, core, default, aux, state)
 
     core_vars = keys(Dataset(core))
     core_vars = [var for var in core_vars if var != "z"]
@@ -135,7 +132,7 @@ function get_meta_data(core, default, aux, state)
     default = Dataset(default)
 
     meta_data = Dict(
-
+		"simulation_id" => parsed_args["name"],
 		"volumetric_variables" => all_diag_vars,
 		"volumetric_num_time_stamps" => vol_num_time_stamps,
 		"volumetric_time_stamps" => vol_time_stamps,
@@ -158,14 +155,53 @@ function get_meta_data(core, default, aux, state)
     return meta_data
 end
 
-function get_site_data(site_num)
+function get_geo_data(site_num)
+	site = parse(Int64, site_num)
 	geo = Dataset("geolocation.nc")
 	site_data = Dict(
-		"site" => geo["site"][site_num],
-		"lat" =>  geo["lat"][site_num],
-		"lon" => geo["lon"][site_num]
+		"lat" =>  geo["lat"][site],
+		"lon" => geo["lon"][site]
 	)
 	return site_data
+end
+
+function get_nimbus_meta_data()
+
+	if isfile("_output/nimbus_meta.json")
+		rm("_output/nimbus_meta.json")
+	end
+
+	nimbus_data = Dict(
+		"sites" => []
+	)
+	sites = sort(readdir("_output"))
+	sites = [site for site in sites if !occursin(".DS_Store", site)]
+	for site in sites
+		site_data = Dict(
+			"site_num" => site[end-1:end],
+			"geocoordinates" => get_geo_data(site[end-1:end]),
+			"simulations" => []
+		)
+		sims = sort(readdir("_output/" * site))
+		sims = [sim for sim in sims if !occursin(".DS_Store", site)]
+		for sim in sims
+			meta_file = "_output/" * site * "/" * sim * "/_meta.json"
+			sim_meta = JSON.parsefile(meta_file)
+			sim_data = Dict(
+				"sim_id" => sim_meta["simulation_id"],
+				"x_extent" => sim_meta["x_extent"],
+				"y_extent" => sim_meta["y_extent"],
+				"z_extent" => sim_meta["z_extent"],
+				"diagnostic_duration" => sim_meta["diagnostic_duration"],
+				"diagnostic_num_time_stamps" => sim_meta["diagnostic_num_time_stamps"],
+				"volumetric_duration" => sim_meta["volumetric_duration"],
+				"volumetric_num_time_stamps" => sim_meta["volumetric_num_time_stamps"]
+			)
+			push!(site_data["simulations"], sim_data)
+		end
+		push!(nimbus_data["sites"], site_data)
+	end
+	return nimbus_data
 end
 
 function main()
@@ -176,7 +212,7 @@ function main()
 
 	parsed_args = get_args()
 
-    files = sort(readdir(parsed_args["input"], join=true))
+    files = sort(readdir(parsed_args["input"] * "/site" * parsed_args["site_num"], join=true))
     files = [file for file in files if occursin(".nc", file)]
 
     diagnostic_file_01 = files[1]
@@ -187,11 +223,10 @@ function main()
 	println("-------------------------------------")
 	println("Converting data for Nimbus...")
 
-	site_folder = parsed_args["output"] * "/" * "site" * parsed_args["site_num"]
+	site_folder = "_output/site" * parsed_args["site_num"]
 	if !isdir(site_folder)
 		mkdir(site_folder)
 	end
-	site_target_file = site_folder * "/_geo.json"
 	sim_folder = site_folder * "/" * parsed_args["name"]
 	mkdir(sim_folder)
     diag_target_file = sim_folder * "/_diagnostic.bson"
@@ -203,22 +238,13 @@ function main()
 	#DATA CONVERSION
 	#--------------------------------------
 
-	site_data = get_site_data(parse(Int64, parsed_args["site_num"]))
     volumetric_data = get_volumetric_data(dump_aux_file, dump_state_file)
     diagnostic_data = get_diagnostic_data(diagnostic_file_01, diagnostic_file_02)
-    meta_data = get_meta_data(diagnostic_file_01, diagnostic_file_02, dump_aux_file, dump_state_file)
+    meta_data = get_meta_data(parsed_args, diagnostic_file_01, diagnostic_file_02, dump_aux_file, dump_state_file)
 
 	#--------------------------------------
 	#PRINT STATEMENTS AND FILE OUTPUT
 	#--------------------------------------
-
-	#SITE DATA
-	if !isfile(site_target_file)
-		s = JSON.json(site_data)
-		open(site_target_file, "w") do x
-			write(x,s)
-		end
-	end
 
 	#META DATA
 	m = JSON.json(meta_data)
@@ -256,6 +282,16 @@ function main()
 	println("\tdiagnostic number of time stamps: " * string(meta_data["diagnostic_num_time_stamps"]))
 	println("\tdiagnostic altitude extent: \n" *
 		"\t\tz: " * string(meta_data["diagnostic_altitude_extent"]))
+	println("-------------------------------------")
+
+	#NIMBUS META
+	println("Outputting nimbus_meta.json...")
+	nimbus_meta = get_nimbus_meta_data()
+	nm = JSON.json(nimbus_meta)
+	open("_output/nimbus_meta.json", "w") do x
+		write(x, nm)
+	end
+	println("FINISHED")
 	println("-------------------------------------")
 end
 
