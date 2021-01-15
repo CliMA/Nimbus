@@ -1,6 +1,10 @@
 node_modules/
-netcdf2nimbus/_input/*
-netcdf2nimbus/_output/*
+
+*.nc
+*.bson
+*.json
+!geolocations.nc
+
 .DS_Store
 /build
 /dist
