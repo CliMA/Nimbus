@@ -23,9 +23,9 @@ export default class SiteSimulationsList extends Component {
       return (
         <SiteSimulationsListItem
           selectSimulationDataset={ this.props.selectSimulationDataset } 
-          key={ `${ this.props.siteData['site_id'] }-${ simData.sim_id }-${ idx }` }
+          key={ `${ `site${ this.props.siteData['site_num'] }`}-${ simData.sim_id }-${ idx }` }
           simData={ simData }
-          site_id={ this.props.siteData['site_id'] }
+          site_id={ `site${ this.props.siteData['site_num'] }` }
         />
       );
     });
@@ -36,7 +36,7 @@ export default class SiteSimulationsList extends Component {
     return (
       <div className={`site-container ${ this.state.isExpanded ? 'expanded' : '' }`}>
         <div className='site-header'>
-          <span>{ this.props.siteData['site_id'] }</span>
+          <span>{ `site${ this.props.siteData['site_num'] }` }</span>
 
           { this.state.isExpanded ? 
             <svg onClick={ this.toggleExpanded.bind(this) }className='icon-collapse' width="18" height="1" viewBox="0 0 18 1" fill="none" xmlns="http://www.w3.org/2000/svg">

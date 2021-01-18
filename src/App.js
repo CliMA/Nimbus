@@ -13,23 +13,23 @@ export default class App extends Component {
     this.state = {
       selectedDatasets: [],
       userSettingsModalOpen: false,
-      hasLaunched: false
+      hasLaunched: false // not being used rn
     }
   }
 
 
   // --------------------------------------------------------
   componentDidMount() {
-
-    axios.get('/siteSimulationList')
+    
+    axios.get('/dbMetadataList')
       .then(res => {
         this.setState({
-          simulationData: res.data
+          dbMetadataList: res.data
         });
-      }).catch(e => {
-        console.log('/simulationData error: ', e);
+      })
+      .catch(e => {
+        console.log('/dbMetadataList error: ', e);
       });
-
 
     axios.get('/userDirectoryPath')
       .then(res => {
@@ -39,14 +39,51 @@ export default class App extends Component {
       });
   }
 
+
+  // --------------------------------------------------------
+  // For now this requests only one simulation but should be 
+  // rewritten for multiple
+  getSimulationData() {
+    
+    // right now these are two separate calls, can they be
+    // combined into one? 
+
+    axios.get('/simMetaFile', {
+      params: {
+        sim: this.state.selectedDatasets[0]
+      }
+    }).then(res => {
+      this.setState({
+        simMetaData: res.data
+      })
+    }).catch(e => {
+      console.log('/simMetaFile error: ', e);
+    });
+
+
+    axios.get('/simDiagnosticFile', {
+      params: {
+        sim: this.state.selectedDatasets[0]
+      }
+    }).then(res => {
+      this.setState({
+        simDiagnosticData: res.data
+      })
+    }).catch(e => {
+      console.log('/simDiagnosticFile error: ', e);
+    });
+  }
+
+
   // --------------------------------------------------------
   generateSiteSimulationsList() {
-    return this.state.simulationData.map(simdata => {
+  
+    return this.state.dbMetadataList['sites'].map(siteMetadata => {
       return (
-        <li className='site-list-item' key={ simdata.site_id }>
+        <li className='site-list-item' key={ `site${ siteMetadata['site_num']} `}>
           <SiteSimulationsList 
             selectSimulationDataset={ this.selectSimulationDataset.bind(this) }
-            siteData={ simdata } 
+            siteData={ siteMetadata } 
           />
         </li>
       );
@@ -75,6 +112,7 @@ export default class App extends Component {
     }
   }
 
+
   // --------------------------------------------------------
   toggleUserSettingsModal() {
     this.setState({
@@ -82,13 +120,17 @@ export default class App extends Component {
     });
   }
 
+
   // --------------------------------------------------------
   render() {
-    console.log('selectedDatasets: ', this.state.selectedDatasets);
     return (
       <>
         {
-          this.state.hasLaunched ? <Viewer /> : 
+          this.state.simMetaData && this.state.simDiagnosticData ? 
+            <Viewer
+              simDiagnosticData={ this.state.simDiagnosticData }
+              simMetaData={ this.state.simMetaData }
+            /> : 
           <div id='data-selection-container'>
             <div id='user-settings-modal' className={ this.state.userSettingsModalOpen ? 'visible' : '' }>
               <span>User directory:</span> 
@@ -109,14 +151,19 @@ export default class App extends Component {
                   </svg>
                 </div>
 
-                <div>
+                <div id='full-site-list'>
                   <ul id='sites-list'>
                     { 
-                      this.state.simulationData ? this.generateSiteSimulationsList() : null
+                      this.state.dbMetadataList ? this.generateSiteSimulationsList() : null
                     }
                   </ul>
                 </div>
-                <button id='btn-launch' disabled={ this.state.selectedDatasets.length > 0 ? false : true }>Launch</button>
+                <button 
+                  id='btn-launch' 
+                  onClick={ this.getSimulationData.bind(this) }
+                  disabled={ this.state.selectedDatasets.length > 0 ? false : true }>
+                    Launch
+                </button>
               </div>
               <div id='map-view'></div>
             </div>

@@ -1,101 +1,49 @@
-const express = require('express');
-const path    = require('path');
-const fs      = require('fs');
-const app     = express();
-const PORT    = 8080;
+const express  = require('express');
+const path     = require('path');
+const fs       = require('fs');
+const app      = express();
+const BSON     = require('bson');
+const PORT     = 8080;
+const userPath = 'netcdf2nimbus/sample_output';
 
 // --------------------------------------------------------
-// SAMPLE DATA
-const sampleSimulationData = [
-  {
-    site_id: 'site_01',
-    geocoordinates: [],
-    simulations: [
-      {
-        sim_id: 'simulation_01',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 6,
-          min: 0,
-          sec: 0
-        },
-        time_steps: 180
-      },
-      {
-        sim_id: 'simulation_02',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 4,
-          min: 30,
-          sec: 30
-        },
-        time_steps: 40
-      },
-      {
-        sim_id: 'simulation_03',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 5,
-          min: 45,
-          sec: 0
-        },
-        time_steps: 60
-      }
-    ]
-  },
+app.get('/dbMetadataList', (req, res) => {
+  fs.readFile('./netcdf2nimbus/database.json', (err, data) => {
+    if (err) {
+      throw err;
+    }
+    res.send(JSON.parse(data));
+  });
+});
 
-  { 
-    site_id: 'site_02',
-    geocoordinates: [],
-    simulations: [
-      {
-        sim_id: 'simulation_04',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 6,
-          min: 0,
-          sec: 0
-        },
-        time_steps: 180
-      },
-      {
-        sim_id: 'simulation_05',
-        domain_dims: {
-          units: 'km',
-          width: 6.4,
-          depth: 6.4,
-          height: 3.0
-        },
-        duration: {
-          hrs: 4,
-          min: 30,
-          sec: 30
-        },
-        time_steps: 40
-      },
-    ]
-  }
-]
+
+// --------------------------------------------------------
+app.get('/simDiagnosticFile', (req, res) => {
+  let sim = JSON.parse(req.query.sim);
+  let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.bson`;
+
+  fs.readFile(diagPath, (err, data) => {
+    if (err) {
+      throw err;
+    }
+    res.send( (BSON.deserialize(data)).data );
+  });
+});
+
+
+// --------------------------------------------------------
+app.get('/simMetaFile', (req, res) => {
+  let sim = JSON.parse(req.query.sim);
+  let metaPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_meta.json`;
+
+  fs.readFile(metaPath, (err, data) => {
+    if (err) {
+      throw err;
+    }
+    res.send(JSON.parse(data));
+  });
+});
+
 
 // --------------------------------------------------------
 // assumes that user-settings.json exists 
@@ -107,11 +55,6 @@ app.get('/userDirectoryPath', (req, res) => {
     let userSettingsData = JSON.parse(data);
     res.send(userSettingsData);
   });
-});
-
-// --------------------------------------------------------
-app.get('/siteSimulationList', (req, res) => {
-  res.send(sampleSimulationData);
 });
 
 // --------------------------------------------------------

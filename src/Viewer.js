@@ -24,6 +24,8 @@ export default class Viewer extends Component {
       // Horizontal
       currentSliceType: 'HORIZONTAL',
       currentAltitude: 1200,
+
+      // these two can go
       horizontalSliceRange: [0, 3000],
       horizontalIncrement: 40,
 
@@ -31,6 +33,8 @@ export default class Viewer extends Component {
       currentVerticalAxis: 'X',
       currentVerticalX: 3000,
       currentVerticalY: 3000,
+
+      // these two can go
       verticalSliceRange: [0, 6400],
       verticalIncrement: 100,
     }
@@ -76,11 +80,14 @@ export default class Viewer extends Component {
   }
 
   // --------------------------------------------------------
-  
   render() {
+    console.log('[Viewer.js] this.props: ', this.props);
+
     return (
       <div className="Viewer">
         <SlicesContainer
+
+          simMetaData={ this.props.simMetaData }
 
           BOMEX_AUX_DATA={ BOMEX_AUX_DATA }
           BOMEX_DATA={ BOMEX_DATA }
@@ -105,6 +112,8 @@ export default class Viewer extends Component {
 
         />
         <DiagnosticPlotsContainer
+          simMetaData={ this.props.simMetaData }
+          simDiagnosticData={ this.props.simDiagnosticData }
           datasets={ this.datasets }
           currentAltitude={ this.state.currentAltitude }
         />

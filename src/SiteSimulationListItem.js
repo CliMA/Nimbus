@@ -30,18 +30,17 @@ export default function SiteSimulationsListItem({ selectSimulationDataset, simDa
           <label 
             className='simulation-id-label' 
             htmlFor={ `${site_id}-${simData.sim_id}` }
-          >{ simData['sim_id'] }</label>
+          >{ `sim_${ simData['sim_id'] }` }</label>
         </div>
         <div className='simulation-meta'>
-          domain dimensions: 
-            { simData['domain_dims']['width'] }{ simData['domain_dims']['units'] } x
-            { simData['domain_dims']['depth'] }{ simData['domain_dims']['units'] } x
-            { simData['domain_dims']['height'] }{ simData['domain_dims']['units'] } 
-            <br/>
-          duration (h/m/s): 
-          { simData['duration']['hrs'] }:{ simData['duration']['min'] }:{ simData['duration']['sec'] }
-          <br/>
-          time steps: { simData['time_steps'] }
+          dimensions (X, Y, Z): <br />
+            { simData.x_extent }km x { simData.y_extent }km x { simData.z_extent }km
+            <br /><br />
+          duration (h/m/s): <br />
+           { simData['diagnostic_duration'] } (diagnostic) <br />{ simData['volumetric_duration'] } (volumetric)
+           <br /><br />
+          timesteps: <br />
+          { simData['diagnostic_num_time_stamps'] } (diagnostic) <br /> { simData['volumetric_num_time_stamps'] } (volumetric)
         </div>
       </div>
     </li>
