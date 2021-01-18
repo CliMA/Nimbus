@@ -1,11 +1,13 @@
-const express = require('express');
-const path    = require('path');
-const fs      = require('fs');
-const app     = express();
-const PORT    = 8080;
+const express  = require('express');
+const path     = require('path');
+const fs       = require('fs');
+const app      = express();
+const BSON     = require('bson');
+const PORT     = 8080;
+const userPath = 'netcdf2nimbus/_output';
 
 // --------------------------------------------------------
-app.get('/simulationMetadata', (req, res) => {
+app.get('/simMetadataList', (req, res) => {
   fs.readFile('./netcdf2nimbus/_output/nimbus_meta.json', (err, data) => {
     if (err) {
       throw err;
@@ -13,6 +15,35 @@ app.get('/simulationMetadata', (req, res) => {
     res.send(JSON.parse(data));
   });
 });
+
+
+// --------------------------------------------------------
+app.get('/simDiagnosticFile', (req, res) => {
+  let sim = JSON.parse(req.query.sim);
+  let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.bson`;
+
+  fs.readFile(diagPath, (err, data) => {
+    if (err) {
+      throw err;
+    }
+    res.send( (BSON.deserialize(data)).data );
+  });
+});
+
+
+// --------------------------------------------------------
+app.get('/simMetaFile', (req, res) => {
+  let sim = JSON.parse(req.query.sim);
+  let metaPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_meta.json`;
+
+  fs.readFile(metaPath, (err, data) => {
+    if (err) {
+      throw err;
+    }
+    res.send(JSON.parse(data));
+  });
+});
+
 
 // --------------------------------------------------------
 // assumes that user-settings.json exists 
