@@ -21,15 +21,15 @@ export default class App extends Component {
   // --------------------------------------------------------
   componentDidMount() {
 
-    axios.get('/siteSimulationList')
+    axios.get('/simulationMetadata')
       .then(res => {
         this.setState({
-          simulationData: res.data
+          simulationMetadata: res.data
         });
-      }).catch(e => {
-        console.log('/simulationData error: ', e);
+      })
+      .catch(e => {
+        console.log('/simulationMetadata error: ', e);
       });
-
 
     axios.get('/userDirectoryPath')
       .then(res => {
@@ -41,12 +41,13 @@ export default class App extends Component {
 
   // --------------------------------------------------------
   generateSiteSimulationsList() {
-    return this.state.simulationData.map(simdata => {
+  
+    return this.state.simulationMetadata['sites'].map(siteMetadata => {
       return (
-        <li className='site-list-item' key={ simdata.site_id }>
+        <li className='site-list-item' key={ `site_${ siteMetadata['site_num']} `}>
           <SiteSimulationsList 
             selectSimulationDataset={ this.selectSimulationDataset.bind(this) }
-            siteData={ simdata } 
+            siteData={ siteMetadata } 
           />
         </li>
       );
@@ -84,7 +85,7 @@ export default class App extends Component {
 
   // --------------------------------------------------------
   render() {
-    console.log('selectedDatasets: ', this.state.selectedDatasets);
+    console.log(this.state.simulationMetadata);
     return (
       <>
         {
@@ -109,10 +110,10 @@ export default class App extends Component {
                   </svg>
                 </div>
 
-                <div>
+                <div id='full-site-list'>
                   <ul id='sites-list'>
                     { 
-                      this.state.simulationData ? this.generateSiteSimulationsList() : null
+                      this.state.simulationMetadata ? this.generateSiteSimulationsList() : null
                     }
                   </ul>
                 </div>
