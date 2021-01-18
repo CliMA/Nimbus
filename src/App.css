@@ -68,6 +68,16 @@ html, body {
   border-bottom: none;
 }
 
+label.simulation-id-label {
+	margin-left: 12px;
+}
+
+#full-site-list {
+  overflow-y: scroll;
+	max-height: 85vh;
+	border-bottom: 1px solid rgb(209, 209, 209);
+}
+
 .site-header {
   height: 4.0vh;
   display: flex;
