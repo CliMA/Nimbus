@@ -4,11 +4,11 @@ This script formats NetCDF data into a binary .json format which can be read by 
 ## Requirements
 This is a Julia script which relies on the following packages:
 
-NCDatasets.jl
-NetCDF.jl
-BSON.jl
-JSON.jl
-ArgParse.jl
+- NCDatasets.jl
+- NetCDF.jl
+- BSON.jl
+- JSON.jl
+- ArgParse.jl
 
 To install from Julia repl:
 `using Pkg`
