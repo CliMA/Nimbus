@@ -15,23 +15,36 @@ To install from Julia repl:
 `Pkg.add([desired package])`
 
 ## Usage
-`julia netcdf2nimbus.jl -i [input file directory] -s [site number] -n [simulation ID]`
+netcdf2nimbus.jl has 3 different modes of operation that are selected by command line tags. The tags are:
 
-For example - to run data from a folder `site23` that is in the directory `_input` with ID of `01`, run this command:
+- `--add` - convert data to nimbus format
+  - `julia netcdf2nimbus.jl --add -i [input_directory] -o [output_directory] -s [site number] -n [simulation ID]`
+- `--db_compile` - compile `database.json` with nimbus data from a given output directory
+  - `julia netcdf2nimbus.jl --db_compile -o [output_directory]`
+- `--db_add` - convert data to nimbus format and recompile `database.json`
+  - `julia netcdf2nimbus.jl --db_add -i [input_directory] -o [output_directory] -s [site number] -n [simulation ID]`
 
-`julia netcdf2nimbus.jl -i _input -s 23 -n 01`
+For example - to add data from a folder `site23` that is in the directory `sample_input` with ID of `01`, and to recompile the database so that it contains that data, run this command:
 
-The input file should be a folder which contains 4 .nc files:
+`julia netcdf2nimbus.jl --db_add -i sample_input -o sample_output -s 23 -n 01`
 
-- 1 core diagnostic file
-- 1 default diagnostic file
-- 1 state volumetric file
-- 1 aux volumetric file
+The input file should be a folder which contains .nc files. The files that `netcdf2nimbus.jl` can handle are as follows:
 
-The script will create a site folder in the directory `_output`, and a simulation folder called [simulation ID] in the site directory that contains:
+- `AtmosLESCore`
+- `AtmosLESDefault`
+- `DumpAux`
+- `DumpState`
+
+It currently operates under the assumption that `AtmosLESCore` and `AtmosLESDefault` will exist for every simulation. If `DumpAux` or `DumpState` are not present in the `[input_directory]`, only diagnostic data will be converted to nimbus format.
+
+Additionally if the input folder contains volumetric data, but you do not wish to convert that data, the tag: `--no_vol` can be added anywhere in the command:
+
+`julia netcdf2nimbus.jl --db_add -i sample_input -o sample_output -s 23 -n 01 --no_vol`
+
+The script will create a site folder in `[output_directory]`, and a simulation folder called `[simulation ID]` in the site directory that contains:
 
 - _meta.bson
 - _diagnostic.bson
-- volumetric/
+- volumetric/ (if it exists)
 
-In addition, a file called `nimbus_meta.json` will be created in the `_output` directory that will keep a current roster of all sites and simulations currently in `_output`. This roster will be re-created each time `netcdf2nimbus.jl` runs in order to keep it accurate, but it will not update if folders are manually deleted. If you delete a site or simulation folder manually, you will need to re-run `netcdf2nimbus.jl` in order to remove that site or simulation from `nimbus_meta.json`.
+In addition, a file called `database.json` will be created in the `netcdf2nimbus` directory that will keep a current roster of all sites and simulations currently in the given [output_directory]. This roster will be re-created each time `netcdf2nimbus.jl` runs in order to keep it accurate, but it will not update if folders are manually deleted. If you delete a site or simulation folder manually, you will need to re-run `netcdf2nimbus.jl --db_compile -o [output_directory]` in order to remove that site or simulation from `database.json`.
