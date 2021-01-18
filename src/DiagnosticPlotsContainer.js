@@ -177,6 +177,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
   // renders elements
   // --------------------------------------------------------
   render() {
+    console.log('[DiagnosticPlotsContainer.js] this.props: ', this.props);
     return (
       <div id='diagnostic-plots-container'>
         <div className='section-header diagnostic-plots-header'>

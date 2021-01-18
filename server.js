@@ -4,12 +4,11 @@ const fs       = require('fs');
 const app      = express();
 const BSON     = require('bson');
 const PORT     = 8080;
-const userPath = 'netcdf2nimbus/_output';
+const userPath = 'netcdf2nimbus/sample_output';
 
 // --------------------------------------------------------
-app.get('/simMetadataList', (req, res) => {
-  // database.json (same level as netcdf2nimbus)
-  fs.readFile('./netcdf2nimbus/_output/nimbus_meta.json', (err, data) => {
+app.get('/dbMetadataList', (req, res) => {
+  fs.readFile('./netcdf2nimbus/database.json', (err, data) => {
     if (err) {
       throw err;
     }

@@ -80,8 +80,9 @@ export default class Viewer extends Component {
   }
 
   // --------------------------------------------------------
-  
   render() {
+    console.log('[Viewer.js] this.props: ', this.props);
+
     return (
       <div className="Viewer">
         <SlicesContainer

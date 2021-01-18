@@ -21,14 +21,14 @@ export default class App extends Component {
   // --------------------------------------------------------
   componentDidMount() {
     
-    axios.get('/simMetadataList')
+    axios.get('/dbMetadataList')
       .then(res => {
         this.setState({
-          simMetadataList: res.data
+          dbMetadataList: res.data
         });
       })
       .catch(e => {
-        console.log('/simMetadataList error: ', e);
+        console.log('/dbMetadataList error: ', e);
       });
 
     axios.get('/userDirectoryPath')
@@ -78,7 +78,7 @@ export default class App extends Component {
   // --------------------------------------------------------
   generateSiteSimulationsList() {
   
-    return this.state.simMetadataList['sites'].map(siteMetadata => {
+    return this.state.dbMetadataList['sites'].map(siteMetadata => {
       return (
         <li className='site-list-item' key={ `site${ siteMetadata['site_num']} `}>
           <SiteSimulationsList 
@@ -123,7 +123,6 @@ export default class App extends Component {
 
   // --------------------------------------------------------
   render() {
-    console.log('this.state: ', this.state);
     return (
       <>
         {
@@ -155,7 +154,7 @@ export default class App extends Component {
                 <div id='full-site-list'>
                   <ul id='sites-list'>
                     { 
-                      this.state.simMetadataList ? this.generateSiteSimulationsList() : null
+                      this.state.dbMetadataList ? this.generateSiteSimulationsList() : null
                     }
                   </ul>
                 </div>
