@@ -8,6 +8,7 @@ const userPath = 'netcdf2nimbus/_output';
 
 // --------------------------------------------------------
 app.get('/simMetadataList', (req, res) => {
+  // database.json (same level as netcdf2nimbus)
   fs.readFile('./netcdf2nimbus/_output/nimbus_meta.json', (err, data) => {
     if (err) {
       throw err;

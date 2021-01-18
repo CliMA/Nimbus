@@ -127,7 +127,11 @@ export default class App extends Component {
     return (
       <>
         {
-          this.state.simMetaData && this.state.simDiagnosticData ? <Viewer /> : 
+          this.state.simMetaData && this.state.simDiagnosticData ? 
+            <Viewer
+              simDiagnosticData={ this.state.simDiagnosticData }
+              simMetaData={ this.state.simMetaData }
+            /> : 
           <div id='data-selection-container'>
             <div id='user-settings-modal' className={ this.state.userSettingsModalOpen ? 'visible' : '' }>
               <span>User directory:</span> 
