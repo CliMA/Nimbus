@@ -21,7 +21,9 @@ function AltVariableScrubber({
   // get averages at each time stamp for the chosen variable, and scale the array so that the
   // bars look good. Set width to window width, and initialize the labels
   // --------------------------------------------------------
-  const alt_var_array = d3.zip(...data[0][currentAltVar]).map(d => d3.mean(d));
+  // const alt_var_array = d3.zip(...data[currentAltVar]).map(d => d3.mean(d));
+  const alt_var_array = data[currentAltVar].map(d => d3.mean(d));
+
   const scaleAmt = 2;
   const scaled_array = scaleArray(alt_var_array, scaleAmt); //2 means there are twice as many bars that are half as wide
   const time_size = ({ w: window.innerWidth, h: 35 });
@@ -49,7 +51,7 @@ function AltVariableScrubber({
 
   // --------------------------------------------------------
   // converts indexes to time stamps to hrs and minutes. this function would need to
-  // change for other simulations.
+  // change for other simulations. THIS NEEDS TO CHANGE
   // --------------------------------------------------------
   const convertToTimestamp = ( start_index, num ) => {
     var hrs = ('0' + Math.floor((start_index + num) * 2 / 60)).slice(-2);

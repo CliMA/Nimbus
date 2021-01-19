@@ -167,13 +167,11 @@ function get_diagnostic_data(file_core, file_default)
 
 	for var in core_vars
 		temp = ncread(file_core, var)
-		# temp = reshape(temp, size(temp))
 		push!(diag_data[var], temp)
     end
 
 	for var in def_vars
 		temp = ncread(file_default, var)
-		# temp = reshape(temp, size(temp))
 		push!(diag_data[var], temp)
     end
 
