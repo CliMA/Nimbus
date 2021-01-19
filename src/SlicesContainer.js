@@ -36,6 +36,12 @@ export default class SlicesContainer extends Component {
     "z" : this.props.BOMEX_coords.z[0]
   };
 
+  // dims = {
+  //   "x" : this.props.simMetaData["x_extent"],
+  //   "y" : this.props.simMetaData["y_extent"],
+  //   "z" : this.props.simMetaData["z_extent"]
+  // };
+
   contour_var_opts = [
     'ρu[1]',
     'ρu[2]',
@@ -47,6 +53,8 @@ export default class SlicesContainer extends Component {
     'moisture.temperature',
     "moisture.θ_v"
   ];
+
+  // contour_var_opts = this.props.simMetaData["volumetric_variables"];
 
   // --------------------------------------------------------
   // Utilities
@@ -235,7 +243,7 @@ export default class SlicesContainer extends Component {
 
             </div>
             <div id="subgrid-dims">
-              <span>6.4 km x 6.4 km x 3.0 km</span>
+              <span>6.0 km x 6.0 km x 4.0 km</span>
             </div>
 
           </div>

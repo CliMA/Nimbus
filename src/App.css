@@ -124,7 +124,7 @@ label.simulation-id-label {
   background: #1f2027;
 }
 
-.icon-expand:hover, 
+.icon-expand:hover,
 .icon-collapse:hover {
   cursor: pointer;
 }
@@ -528,7 +528,7 @@ div.tick {
   position: absolute;
   left: 0;
   padding-left: 20px;
-  bottom: 32px;
+  bottom: 42px;
 }
 
 .plot {

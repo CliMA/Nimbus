@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import Dropdown from './Dropdown';
 
 function DiagnosticPlot({
-  compareOn, extentsOn, customRange, defaultVars, defaultVar, data
+  compareOn, extentsOn, customRange, defaultVars, defaultVar, data, metaData
 }) {
 
   const [displayedVar, setDisplayedVar] = useState(defaultVar);
@@ -13,10 +13,10 @@ function DiagnosticPlot({
   // could be used to replace the two lines below
 
   const extents = (dataset) => {
-    return dataset[displayedVar].map(d => d3.extent(d.slice(customRange.left,customRange.right)));
+    return d3.zip(...dataset[displayedVar]).map(d => d3.extent(d.slice(customRange.left,customRange.right)));
   }
 
-  const extents1 = data[displayedVar].map(d => d3.extent(d.slice(customRange.left,customRange.right)));
+  const extents1 = d3.zip(...data[displayedVar]).map(d => d3.extent(d.slice(customRange.left,customRange.right)));
   //const extents2 = d3.zip(...data[1][displayedVar]).map(d => d3.extent(d.slice(customRange.left,customRange.right)));
 
   // --------------------------------------------------------
@@ -27,12 +27,12 @@ function DiagnosticPlot({
   //   return dataset[displayedVar].map(d => d3.mean(d.slice(customRange.left,customRange.right)));
   // }
 
-  const means1 = data[displayedVar].map(d => d3.mean(d.slice(customRange.left,customRange.right)));
+  const means1 = d3.zip(...data[displayedVar]).map(d => d3.mean(d.slice(customRange.left,customRange.right)));
   //const means2 = d3.zip(...data[1][displayedVar]).map(d => d3.mean(d.slice(customRange.left,customRange.right)));
   // --------------------------------------------------------
   // UTILS
 
-  const z_mod = this.props.simMetaData["diagnostic_altitude_extent"]/this.props.simMetaData["diagnostic_altitudes"].length
+  const z_mod = metaData["diagnostic_altitude_extent"]/metaData["diagnostic_altitudes"].length
 
   const axis_height = 20;
 
@@ -42,12 +42,12 @@ function DiagnosticPlot({
 
   // d3 scales to draw lines and axes
   const z_data_y = d3.scaleLinear()
-    .domain([0, this.props.simMetaData["diagnostic_altitude_extent"]])
+    .domain([0, metaData["diagnostic_altitude_extent"]])
     .range([z_height, 0]);
 
 
   const default_x = d3.scaleLinear()
-    .domain(d3.extent(d3.merge(extents(data[0]))))
+    .domain(d3.extent(d3.merge(extents(data))))
     .range([0, width]);
 
 

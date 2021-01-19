@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import React, { useRef, useEffect } from 'react';
 
-function DiagnosticYAxis({ slice_type, altitude }) {
+function DiagnosticYAxis({ slice_type, altitude, metaData }) {
 
   // dimensions
   const width = window.innerWidth - 50;
@@ -10,7 +10,7 @@ function DiagnosticYAxis({ slice_type, altitude }) {
 
   // d3 scale
   const z_data_y = d3.scaleLinear()
-    .domain([0,3000])
+    .domain([0, metaData["diagnostic_altitude_extent"]])
     .range([z_height, 0]);
 
   // draws axis and horizontal line based on altitude parameter
@@ -21,7 +21,7 @@ function DiagnosticYAxis({ slice_type, altitude }) {
     // creates svg element
     const svg = d3.select(ref.current)
       .attr('width', width)
-      .attr('height', z_height + 15);
+      .attr('height', z_height + 30);
     // removes old elements to prevent stacking
     svg.selectAll("*").remove();
 
