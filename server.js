@@ -20,13 +20,15 @@ app.get('/dbMetadataList', (req, res) => {
 // --------------------------------------------------------
 app.get('/simDiagnosticFile', (req, res) => {
   let sim = JSON.parse(req.query.sim);
-  let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.bson`;
+  let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.json`;
 
   fs.readFile(diagPath, (err, data) => {
     if (err) {
       throw err;
     }
-    res.send( (BSON.deserialize(data, {promoteValues: true} )).data );
+    // res.send( (BSON.deserialize(data, {promoteValues: true} )).data );
+  res.send(JSON.parse(data));
+
   });
 });
 

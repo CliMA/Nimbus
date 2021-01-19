@@ -247,6 +247,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
             <DiagnosticYAxis
               slice_type={ "HORIZONTAL" }
               altitude={ this.props.currentAltitude }
+              metaData={ this.props.simMetaData }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -255,6 +256,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               defaultVars={ this.default_vars1 }
               defaultVar={ this.default_vars1[5] }
               data={ this.props.simDiagnosticData }
+              metaData={ this.props.simMetaData }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -263,6 +265,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               defaultVars={ this.default_vars2 }
               defaultVar={ this.default_vars2[9] }
               data={ this.props.simDiagnosticData }
+              metaData={ this.props.simMetaData }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -271,6 +274,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               defaultVars={ this.default_vars3 }
               defaultVar={ this.default_vars3[3] }
               data={ this.props.simDiagnosticData }
+              metaData={ this.props.simMetaData }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -279,6 +283,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               defaultVars={ this.default_vars4 }
               defaultVar={ this.default_vars4[0] }
               data={ this.props.simDiagnosticData }
+              metaData={ this.props.simMetaData }
             />
           </div>
         </div>
