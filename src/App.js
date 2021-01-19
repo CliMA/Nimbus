@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import Viewer from './Viewer';
+import WorldMap from './WorldMap';
 import SiteSimulationsList from './SiteSimulationsList';
 import axios from 'axios';
 
@@ -67,6 +68,7 @@ export default class App extends Component {
       }
     }).then(res => {
       this.setState({
+
         simDiagnosticData: res.data
       })
     }).catch(e => {
@@ -158,6 +160,10 @@ export default class App extends Component {
                     }
                   </ul>
                 </div>
+                
+              </div>
+              <div id='map-view'>
+                <WorldMap />
                 <button 
                   id='btn-launch' 
                   onClick={ this.getSimulationData.bind(this) }
@@ -165,7 +171,6 @@ export default class App extends Component {
                     Launch
                 </button>
               </div>
-              <div id='map-view'></div>
             </div>
           </div> 
         }

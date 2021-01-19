@@ -26,7 +26,7 @@ app.get('/simDiagnosticFile', (req, res) => {
     if (err) {
       throw err;
     }
-    res.send( (BSON.deserialize(data)).data );
+    res.send( (BSON.deserialize(data, {promoteValues: true} )).data );
   });
 });
 
