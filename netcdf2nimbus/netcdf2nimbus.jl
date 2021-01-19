@@ -323,6 +323,13 @@ function compile_database(output_folder)
 	return nimbus_data
 end
 
+function write_to_json(data, target_file)
+	d = JSON.json(data)
+	open(target_file, "w") do x
+		write(x,d)
+	end
+end
+
 # function add_to_database(output_folder, site_num, sim_id)
 # 	# read database.json and add simulation data in the right site folder
 # 	if !isfile("database.json")
@@ -437,7 +444,8 @@ function main()
 		end
 		sim_folder = site_folder * "/" * parsed_args["name"]
 		mkdir(sim_folder)
-	    diag_target_file = sim_folder * "/_diagnostic.bson"
+	    # diag_target_file = sim_folder * "/_diagnostic.bson"
+		diag_target_file = sim_folder * "/_diagnostic.json"
 	    meta_target_file = sim_folder * "/_meta.json"
 		if vol
 			mkdir(sim_folder * "/volumetric")
@@ -462,13 +470,11 @@ function main()
 		#--------------------------------------
 
 		#META DATA
-		m = JSON.json(meta_data)
-		open(meta_target_file, "w") do x
-			write(x,m)
-		end
+		write_to_json(meta_data, meta_target_file)
 
 		#DIAGNOSTIC DATA
-		bson(diag_target_file, diagnostic_data)
+		write_to_json(diagnostic_data, diag_target_file)
+		# bson(diag_target_file, diagnostic_data)
 		println("\tconverting diagnostic data...")
 
 		#VOLUMETRIC DATA
@@ -476,7 +482,8 @@ function main()
 			counter = 1
 			println("\tconverting volumetric data...")
 			for time_stamp in volumetric_data
-				bson(vol_target_folder * "/volumetric_" * string(counter) * ".bson", time_stamp)
+				write_to_json(time_stamp, vol_target_folder * "/volumetric_" * string(counter) * ".json")
+				# bson(vol_target_folder * "/volumetric_" * string(counter) * ".bson", time_stamp)
 				println("\t\ttimestamp " * string(counter) * "...")
 				counter+=1
 			end

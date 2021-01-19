@@ -19,7 +19,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
       // sets start range for scrubber to be the whole domain
       custom_range : {
         left: 0,
-        right: 179
+        right: this.props.simMetaData["diagnostic_num_time_stamps"]
       },
       // sets inital variable for timeline
       currentAltVar : 'tke'
@@ -31,53 +31,55 @@ export default class DiagnosticPlotsContainer extends React.Component {
     this.handleChangeDropdownVar = this.handleChangeDropdownVar.bind(this)
   }
 
+  timeline_alt_vars = this.props.simMetaData["diagnostic_variables"]
   // variable lists for dropdowns
-  timeline_alt_vars = [
-    "tke",
-    "cld_base",
-    "cld_cover",
-    "cld_top",
-    "u",
-    "v",
-    "w",
-    "avg_rho",
-    "rho",
-    "qt",
-    "ql",
-    "thv",
-    "thl",
-    "temp",
-    "pres",
-    "thd",
-    "ei",
-    "et",
-    "ht",
-    "hi",
-    "w_ht_sgs",
-    "qv",
-    "w_qt_sgs",
-    "var_u",
-    "var_v",
-    "var_w",
-    "w3",
-    "tke",
-    "var_qt",
-    "var_thl",
-    "var_ei",
-    "cov_w_u",
-    "cov_w_v",
-    "cov_w_rho",
-    "cov_w_qt",
-    "cov_w_ql",
-    "cov_w_qv",
-    "cov_w_thd",
-    "cov_w_thv",
-    "cov_w_thl",
-    "cov_w_ei",
-    "cov_qt_thl",
-    "cov_qt_ei",
-    "cld_frac"
-  ];
+  // OLD
+  // timeline_alt_vars = [
+  //   "tke",
+  //   "cld_base",
+  //   "cld_cover",
+  //   "cld_top",
+  //   "u",
+  //   "v",
+  //   "w",
+  //   "avg_rho",
+  //   "rho",
+  //   "qt",
+  //   "ql",
+  //   "thv",
+  //   "thl",
+  //   "temp",
+  //   "pres",
+  //   "thd",
+  //   "ei",
+  //   "et",
+  //   "ht",
+  //   "hi",
+  //   "w_ht_sgs",
+  //   "qv",
+  //   "w_qt_sgs",
+  //   "var_u",
+  //   "var_v",
+  //   "var_w",
+  //   "w3",
+  //   "tke",
+  //   "var_qt",
+  //   "var_thl",
+  //   "var_ei",
+  //   "cov_w_u",
+  //   "cov_w_v",
+  //   "cov_w_rho",
+  //   "cov_w_qt",
+  //   "cov_w_ql",
+  //   "cov_w_qv",
+  //   "cov_w_thd",
+  //   "cov_w_thv",
+  //   "cov_w_thl",
+  //   "cov_w_ei",
+  //   "cov_qt_thl",
+  //   "cov_qt_ei",
+  //   "cld_frac"
+  // ];
 
   default_timeline_alt_vars = [
     "tke",
@@ -252,7 +254,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               customRange={ this.state.custom_range }
               defaultVars={ this.default_vars1 }
               defaultVar={ this.default_vars1[5] }
-              data={ this.props.datasets }
+              data={ this.props.simDiagnosticData }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -260,7 +262,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               customRange={ this.state.custom_range }
               defaultVars={ this.default_vars2 }
               defaultVar={ this.default_vars2[9] }
-              data={ this.props.datasets }
+              data={ this.props.simDiagnosticData }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -268,7 +270,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               customRange={ this.state.custom_range }
               defaultVars={ this.default_vars3 }
               defaultVar={ this.default_vars3[3] }
-              data={ this.props.datasets }
+              data={ this.props.simDiagnosticData }
             />
             <DiagnosticPlot
               compareOn={ this.state.compareOn }
@@ -276,7 +278,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
               customRange={ this.state.custom_range }
               defaultVars={ this.default_vars4 }
               defaultVar={ this.default_vars4[0] }
-              data={ this.props.datasets }
+              data={ this.props.simDiagnosticData }
             />
           </div>
         </div>
@@ -285,7 +287,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
             currentAltVar={ this.state.currentAltVar }
             handleUpdateInterval={ this.handleUpdateInterval }
             customRange={ this.state.custom_range }
-            data={ this.props.datasets }
+            data={ this.props.simDiagnosticData }
           />
         </div>
       </div>

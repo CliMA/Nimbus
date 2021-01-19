@@ -46,7 +46,7 @@ app.get('/simMetaFile', (req, res) => {
 
 
 // --------------------------------------------------------
-// assumes that user-settings.json exists 
+// assumes that user-settings.json exists
 app.get('/userDirectoryPath', (req, res) => {
   fs.readFile('user-settings.json', (err, data) => {
     if (err) {
