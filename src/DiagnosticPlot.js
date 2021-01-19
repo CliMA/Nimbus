@@ -16,8 +16,8 @@ function DiagnosticPlot({
     return dataset[displayedVar].map(d => d3.extent(d.slice(customRange.left,customRange.right)));
   }
 
-  const extents1 = data[0][displayedVar].map(d => d3.extent(d.slice(customRange.left,customRange.right)));
-  const extents2 = d3.zip(...data[1][displayedVar]).map(d => d3.extent(d.slice(customRange.left,customRange.right)));
+  const extents1 = data[displayedVar].map(d => d3.extent(d.slice(customRange.left,customRange.right)));
+  //const extents2 = d3.zip(...data[1][displayedVar]).map(d => d3.extent(d.slice(customRange.left,customRange.right)));
 
   // --------------------------------------------------------
   // MEANS - the two sets of means are currently hardcoded, but this function
@@ -27,10 +27,13 @@ function DiagnosticPlot({
   //   return dataset[displayedVar].map(d => d3.mean(d.slice(customRange.left,customRange.right)));
   // }
 
-  const means1 = data[0][displayedVar].map(d => d3.mean(d.slice(customRange.left,customRange.right)));
-  const means2 = d3.zip(...data[1][displayedVar]).map(d => d3.mean(d.slice(customRange.left,customRange.right)));
+  const means1 = data[displayedVar].map(d => d3.mean(d.slice(customRange.left,customRange.right)));
+  //const means2 = d3.zip(...data[1][displayedVar]).map(d => d3.mean(d.slice(customRange.left,customRange.right)));
   // --------------------------------------------------------
   // UTILS
+
+  const z_mod = this.props.simMetaData["diagnostic_altitude_extent"]/this.props.simMetaData["diagnostic_altitudes"].length
+
   const axis_height = 20;
 
   const width = window.innerWidth * .2;
@@ -39,7 +42,7 @@ function DiagnosticPlot({
 
   // d3 scales to draw lines and axes
   const z_data_y = d3.scaleLinear()
-    .domain([0,3000])
+    .domain([0, this.props.simMetaData["diagnostic_altitude_extent"]])
     .range([z_height, 0]);
 
 
@@ -52,13 +55,13 @@ function DiagnosticPlot({
   const default_extent_shadow = d3.area()
     .x0(d => default_x(d[0]))
     .x1(d => default_x(d[1]))
-    .y((d, i) => z_data_y(i*40));
+    .y((d, i) => z_data_y(i*z_mod));
 
 
   // creates line for mean from given data
   const default_line = d3.line()
     .x(d => default_x(d))
-    .y((d,i) => z_data_y(i*40));
+    .y((d,i) => z_data_y(i*z_mod));
 
   // creates x axis
   const default_xAxis = (g) => {
@@ -97,13 +100,13 @@ function DiagnosticPlot({
       context.fill();
       context.closePath();
 
-      if (compareOn) {
-        context.beginPath();
-        default_extent_shadow(extents2);
-        context.fillStyle = 'rgba(197,161,215,.4)';
-        context.fill();
-        context.closePath();
-      }
+      // if (compareOn) {
+      //   context.beginPath();
+      //   default_extent_shadow(extents2);
+      //   context.fillStyle = 'rgba(197,161,215,.4)';
+      //   context.fill();
+      //   context.closePath();
+      // }
     }
 
     // mean lines
@@ -114,14 +117,14 @@ function DiagnosticPlot({
     context.stroke();
     context.closePath();
 
-    if (compareOn) {
-      context.beginPath();
-      default_line(means2);
-      context.strokeStyle = 'rgb(197,161,215)';
-      context.lineWidth = 1.5;
-      context.stroke();
-      context.closePath();
-    }
+    // if (compareOn) {
+    //   context.beginPath();
+    //   default_line(means2);
+    //   context.strokeStyle = 'rgb(197,161,215)';
+    //   context.lineWidth = 1.5;
+    //   context.stroke();
+    //   context.closePath();
+    // }
 
     context.restore();
 
