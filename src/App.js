@@ -163,7 +163,9 @@ export default class App extends Component {
                 
               </div>
               <div id='map-view'>
-                <WorldMap />
+                <WorldMap 
+                  dbMetadataList={ this.state.dbMetadataList }
+                />
                 <button 
                   id='btn-launch' 
                   onClick={ this.getSimulationData.bind(this) }
