@@ -179,9 +179,12 @@ export default class App extends Component {
 
               </div>
               <div id='map-view'>
-                <WorldMap />
-                <button
-                  id='btn-launch'
+
+                <WorldMap 
+                  dbMetadataList={ this.state.dbMetadataList }
+                />
+                <button 
+                  id='btn-launch' 
                   onClick={ this.getSimulationData.bind(this) }
                   disabled={ this.state.selectedDatasets.length > 0 ? false : true }>
                     Launch
