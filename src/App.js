@@ -21,7 +21,7 @@ export default class App extends Component {
 
   // --------------------------------------------------------
   componentDidMount() {
-    
+
     axios.get('/dbMetadataList')
       .then(res => {
         this.setState({
@@ -34,7 +34,7 @@ export default class App extends Component {
 
     axios.get('/userDirectoryPath')
       .then(res => {
-        this.setState({ 
+        this.setState({
           userDirectory: res.data['user_directory']
         });
       });
@@ -42,12 +42,12 @@ export default class App extends Component {
 
 
   // --------------------------------------------------------
-  // For now this requests only one simulation but should be 
+  // For now this requests only one simulation but should be
   // rewritten for multiple
   getSimulationData() {
-    
+
     // right now these are two separate calls, can they be
-    // combined into one? 
+    // combined into one?
 
     axios.get('/simMetaFile', {
       params: {
@@ -74,18 +74,33 @@ export default class App extends Component {
     }).catch(e => {
       console.log('/simDiagnosticFile error: ', e);
     });
+
+
+
+    axios.get('/simDiagnosticBSON', {
+      params: {
+        sim: this.state.selectedDatasets[0]
+      }
+    }).then(res => {
+      this.setState({
+
+        simDiagnosticBSON: res.data
+      })
+    }).catch(e => {
+      console.log('/simDiagnosticBSON error: ', e);
+    });
   }
 
 
   // --------------------------------------------------------
   generateSiteSimulationsList() {
-  
+
     return this.state.dbMetadataList['sites'].map(siteMetadata => {
       return (
         <li className='site-list-item' key={ `site${ siteMetadata['site_num']} `}>
-          <SiteSimulationsList 
+          <SiteSimulationsList
             selectSimulationDataset={ this.selectSimulationDataset.bind(this) }
-            siteData={ siteMetadata } 
+            siteData={ siteMetadata }
           />
         </li>
       );
@@ -95,14 +110,14 @@ export default class App extends Component {
 
   // --------------------------------------------------------
   selectSimulationDataset(simdata) {
-    
+
     // This could probably be more efficient
     let idx = this.state.selectedDatasets.findIndex(data => data['selection_id'] === simdata['selection_id']);
 
     if (idx === -1) {
       // not found, add it
-      this.setState({ 
-        selectedDatasets: [...this.state.selectedDatasets, simdata] 
+      this.setState({
+        selectedDatasets: [...this.state.selectedDatasets, simdata]
       })
     } else {
       // nothing found so we add it
@@ -128,14 +143,15 @@ export default class App extends Component {
     return (
       <>
         {
-          this.state.simMetaData && this.state.simDiagnosticData ? 
+          this.state.simMetaData && this.state.simDiagnosticData && this.state.simDiagnosticBSON ?
             <Viewer
               simDiagnosticData={ this.state.simDiagnosticData }
               simMetaData={ this.state.simMetaData }
-            /> : 
+              simDiagnosticBSON={ this.state.simDiagnosticBSON }
+            /> :
           <div id='data-selection-container'>
             <div id='user-settings-modal' className={ this.state.userSettingsModalOpen ? 'visible' : '' }>
-              <span>User directory:</span> 
+              <span>User directory:</span>
               <div id='user-directory-container'>
                 <span>{ this.state.userDirectory }</span>
               </div>
@@ -155,24 +171,24 @@ export default class App extends Component {
 
                 <div id='full-site-list'>
                   <ul id='sites-list'>
-                    { 
+                    {
                       this.state.dbMetadataList ? this.generateSiteSimulationsList() : null
                     }
                   </ul>
                 </div>
-                
+
               </div>
               <div id='map-view'>
                 <WorldMap />
-                <button 
-                  id='btn-launch' 
+                <button
+                  id='btn-launch'
                   onClick={ this.getSimulationData.bind(this) }
                   disabled={ this.state.selectedDatasets.length > 0 ? false : true }>
                     Launch
                 </button>
               </div>
             </div>
-          </div> 
+          </div>
         }
       </>
     )

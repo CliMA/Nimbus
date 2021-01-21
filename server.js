@@ -32,6 +32,24 @@ app.get('/simDiagnosticFile', (req, res) => {
   });
 });
 
+// --------------------------------------------------------
+app.get('/simDiagnosticBSON', (req, res) => {
+  let sim = JSON.parse(req.query.sim);
+  let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.bson`;
+
+  fs.readFile(diagPath, (err, data) => {
+    if (err) {
+      throw err;
+    }
+
+  uint8Array  = new Uint8Array(data);
+  d = BSON.deserialize(uint8Array, {promoteValues: true} );
+
+  res.send( d.data );
+
+  });
+});
+
 
 // --------------------------------------------------------
 app.get('/simMetaFile', (req, res) => {
