@@ -203,14 +203,14 @@ export default class DiagnosticPlotsContainer extends React.Component {
               />
             </div>
 
-            <div id='compare-toggle'>
+            {/* <div id='compare-toggle'>
               <span id='compare-label'>Compare</span>
               <Switch
                 toggleName={ 'compare '}
                 isOn={ this.state.compareOn }
                 handleToggle={ this.handleToggleCompareOn }
               />
-            </div>
+            </div> */}
 
             {
               this.state.compareOn ?
