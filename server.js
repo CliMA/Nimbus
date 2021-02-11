@@ -5,6 +5,8 @@ const app      = express();
 const BSON     = require('bson');
 const PORT     = 8080;
 const userPath = 'netcdf2nimbus/sample_output';
+const SIZE_OF_DOUBLE = 8;
+
 
 // --------------------------------------------------------
 app.get('/dbMetadataList', (req, res) => {
@@ -24,33 +26,15 @@ app.get('/dbMetadataList', (req, res) => {
 // --------------------------------------------------------
 app.get('/simDiagnosticFile', (req, res) => {
   let sim = JSON.parse(req.query.sim);
-  let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.json`;
-
-  fs.readFile(diagPath, (err, data) => {
-    if (err) {
-      throw err;
-    }
-    // res.send( (BSON.deserialize(data, {promoteValues: true} )).data );
-  res.send(JSON.parse(data));
-
-  });
-});
-
-// --------------------------------------------------------
-app.get('/simDiagnosticBSON', (req, res) => {
-  let sim = JSON.parse(req.query.sim);
   let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.bson`;
 
   fs.readFile(diagPath, (err, data) => {
     if (err) {
       throw err;
     }
-
-  uint8Array  = new Uint8Array(data);
-  d = BSON.deserialize(uint8Array, {promoteValues: true} );
-
-  res.send( d.data );
-
+    ds = BSON.deserialize(data);
+    parsed_ds = BSON_parse(ds);
+    res.send(parsed_ds);
   });
 });
 
@@ -92,3 +76,54 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`listening on PORT ${ PORT }`);
 });
+
+// --------------------------------------------------------
+// pass in deserialized bson. works for 1D, 2D, and 3D arrays
+// --------------------------------------------------------
+function BSON_parse(ds) {
+  let variable_names = ds["data"][0];
+  let num_variables = variable_names.length;
+  let dict = {};
+  for (let i=0; i<num_variables; i++) {
+    let big_array = [];
+    let struct = ds["data"][1][i];
+    let dims = struct["size"];
+    let buffer = struct["data"]["buffer"];
+    if (dims.length == 3) {
+      for (let m=0; m<dims[0]; m++) {
+        let medium_array = [];
+        for (let n=0; n<dims[1]; n++) {
+          let small_array = [];
+          let bufferlength = dims[2] * SIZE_OF_DOUBLE;
+          for(let j=0; j<bufferlength; j+=SIZE_OF_DOUBLE) {
+            let offset = (m*n*bufferlength) + (n*bufferlength) + j;
+            let d = buffer.readDoubleLE(offset);
+            small_array.push(d);
+          }
+          medium_array.push(small_array);
+        }
+        big_array.push(medium_array);
+      }
+    }
+    else if (dims.length == 2) {
+      for (let m=0; m<dims[0]; m++) {
+        let small_array = [];
+        let bufferlength = dims[1] * SIZE_OF_DOUBLE;
+        for(let n=0; n<bufferlength; n+=SIZE_OF_DOUBLE) {
+          let offset = (m * bufferlength) + n;
+          let d = buffer.readDoubleLE(offset);
+          small_array.push(d);
+        }
+        big_array.push(small_array);
+      }
+    } else {
+      let bufferlength = dims[0] * SIZE_OF_DOUBLE;
+      for(let m=0; m<bufferlength; m+=SIZE_OF_DOUBLE) {
+        let d = buffer.readDoubleLE(m);
+        big_array.push(d);
+      }
+    }
+    dict[variable_names[i]] = big_array;
+  }
+  return dict;
+}
