@@ -328,68 +328,6 @@ function write_to_json(data, target_file)
 	end
 end
 
-# function add_to_database(output_folder, site_num, sim_id)
-# 	# read database.json and add simulation data in the right site folder
-# 	if !isfile("database.json")
-# 		# error - no database file - run in compile mode
-# 	end
-#
-# 	db = JSON.parsefile("database.json")
-#
-# 	# check if site folder already exists in database
-# 	site_exists = false
-# 	site_index = 1
-# 	for site in db["sites"]
-# 		if site["site_num"] == site_num
-# 			site_exists = true
-# 		end
-# 		if !site_exists
-# 			site_index+=1
-# 		end
-# 	end
-#
-# 	# if site folder doesnt already exist
-# 	if !site_exists
-# 		site_data = Dict(
-# 			"site_num" => site_num,
-# 			"geocoordinates" => get_geo_data(site_num),
-# 			"simulations" => []
-# 		)
-# 		meta_file = output_folder * "/site" * site_num * "/" * sim * "/_meta.json"
-# 		sim_meta = JSON.parsefile(meta_file)
-# 		sim_data = Dict(
-# 			"sim_id" => sim_meta["simulation_id"],
-# 			"x_extent" => sim_meta["x_extent"],
-# 			"y_extent" => sim_meta["y_extent"],
-# 			"z_extent" => sim_meta["z_extent"],
-# 			"diagnostic_duration" => sim_meta["diagnostic_duration"],
-# 			"diagnostic_num_time_stamps" => sim_meta["diagnostic_num_time_stamps"],
-# 			"volumetric_duration" => sim_meta["volumetric_duration"],
-# 			"volumetric_num_time_stamps" => sim_meta["volumetric_num_time_stamps"]
-# 		)
-# 		push!(site_data["simulations"], sim_data)
-# 		push!(db["sites"], site_data)
-#
-# 	# if site folder exists and we're just adding the indicated simulation
-# 	else
-# 		meta_file = output_folder * "/site" * site_num * "/" * sim * "/_meta.json"
-# 		sim_meta = JSON.parsefile(meta_file)
-# 		sim_data = Dict(
-# 			"sim_id" => sim_meta["simulation_id"],
-# 			"x_extent" => sim_meta["x_extent"],
-# 			"y_extent" => sim_meta["y_extent"],
-# 			"z_extent" => sim_meta["z_extent"],
-# 			"diagnostic_duration" => sim_meta["diagnostic_duration"],
-# 			"diagnostic_num_time_stamps" => sim_meta["diagnostic_num_time_stamps"],
-# 			"volumetric_duration" => sim_meta["volumetric_duration"],
-# 			"volumetric_num_time_stamps" => sim_meta["volumetric_num_time_stamps"]
-# 		)
-# 		push!(db["sites"][site_index]["simulations"], sim_data)
-# 	end
-#
-# 	return db
-# end
-
 function main()
 
 	parsed_args = get_args()
@@ -442,8 +380,7 @@ function main()
 		end
 		sim_folder = site_folder * "/" * parsed_args["name"]
 		mkdir(sim_folder)
-	    # diag_target_file = sim_folder * "/_diagnostic.bson"
-		diag_target_file = sim_folder * "/_diagnostic.json"
+		diag_target_file = sim_folder * "/_diagnostic.bson"
 	    meta_target_file = sim_folder * "/_meta.json"
 		if vol
 			mkdir(sim_folder * "/volumetric")
@@ -471,8 +408,7 @@ function main()
 		write_to_json(meta_data, meta_target_file)
 
 		#DIAGNOSTIC DATA
-		write_to_json(diagnostic_data, diag_target_file)
-		# bson(diag_target_file, diagnostic_data)
+		bson(diag_target_file, diagnostic_data)
 		println("\tconverting diagnostic data...")
 
 		#VOLUMETRIC DATA
@@ -480,8 +416,7 @@ function main()
 			counter = 1
 			println("\tconverting volumetric data...")
 			for time_stamp in volumetric_data
-				write_to_json(time_stamp, vol_target_folder * "/volumetric_" * string(counter) * ".json")
-				# bson(vol_target_folder * "/volumetric_" * string(counter) * ".bson", time_stamp)
+				bson(vol_target_folder * "/volumetric_" * string(counter) * ".bson", time_stamp)
 				println("\t\ttimestamp " * string(counter) * "...")
 				counter+=1
 			end
