@@ -32,10 +32,6 @@ Make sure you have installed Node & NPM. One way to do this is with [Homebrew](h
 
 Clone the repo, cd into the directory, and then run `npm install` to install the required dependencies for the project.
 
-In a terminal window, run `node server.js` to start the server (running on port  `8080`).
-
-In another terminal winow, run `npm run start` and open a browser to `localhost:3000`. To run this with a development build for Electron, you can run `npm run dev` and that will launch both the dev server on `localhost:3000` as well as the Electron application.
-
 
 ## App Structure
 As mentioned above, this project was initially created with `create-react-app`. Therefore, Webpack and Babel are preconfigured. If you wish to create a custom configuration, you will need to run `npm run eject`, which will extract the configuration files for you that you can then change.
@@ -45,6 +41,23 @@ The entry point of the application is `index.js`. That is where we import the `A
 Similarly, these child components also import other components - for example, `SlicesContainer` uses the `HorizontalSlice` and `VerticalSlice` functional components.
 
 The data visualizations are created with d3, and use both SVG and Canvas for rendering.
+
+
+## DEVELOPMENT
+In a terminal window, run `node server.js` to start the server (running on port  `8080`).
+In another terminal winow, run `npm run start` and open a browser to `localhost:3000`. 
+
+The `start` script is run from the react-scripts module as part of create-react-app see [here](https://create-react-app.dev/docs/available-scripts/), which uses its own webpack config. We have not changed that. To make a custom config, you must first eject (see aforementioned link to available scripts above).
+
+Calls to the node server running on 8080 are done via proxy so that calls can be made from port 3000 - this is set up in `package.json`. 
+
+
+## PRODUCTION - Web
+To create a production build for the web, run `npm run build` in terminal. This will create the bundled react js files in build > static > js. Once that is complete, you should be able to run the server again with `node server.js`, which serves the build directory. You should be able to open a browser tab to `localhost:8080`.
+
+
+## PRODUCTION - Electron
+
 
 
 ## Notes
