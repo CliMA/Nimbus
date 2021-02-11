@@ -20,6 +20,10 @@ app.get('/dbMetadataList', (req, res) => {
 
 
 // --------------------------------------------------------
+
+
+
+// --------------------------------------------------------
 app.get('/simDiagnosticFile', (req, res) => {
   let sim = JSON.parse(req.query.sim);
   let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.bson`;
