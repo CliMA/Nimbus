@@ -74,12 +74,11 @@ export default class Viewer extends Component {
 
   // --------------------------------------------------------
   render() {
-    console.log('[Viewer.js] this.props: ', this.props);
-
     return (
       <div className="Viewer">
         <SlicesContainer
 
+          selectedDatasets={ this.props.selectedDatasets }
           simMetaData={ this.props.simMetaData }
 
           BOMEX_AUX_DATA={ BOMEX_AUX_DATA }

@@ -1,10 +1,11 @@
-const express  = require('express');
-const path     = require('path');
-const fs       = require('fs');
-const app      = express();
-const BSON     = require('bson');
-const PORT     = 8080;
-const userPath = 'netcdf2nimbus/sample_output';
+const express        = require('express');
+const path           = require('path');
+const fs             = require('fs');
+const async          = require('async');
+const app            = express();
+const BSON           = require('bson');
+const PORT           = 8080;
+const userPath       = 'netcdf2nimbus/sample_output';
 const SIZE_OF_DOUBLE = 8;
 
 
@@ -20,7 +21,49 @@ app.get('/dbMetadataList', (req, res) => {
 
 
 // --------------------------------------------------------
+/* At time of writing, we were given simulation data with 
+  only two volumetric files. This call needs to be updated
+  later to handle multiple / larger batch calls as desired.
+*/
+app.get('/simVolumetricFiles', (req, res) => {
+  let sim = JSON.parse(req.query.sim);
+  let volumetricDirPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/volumetric/`;
 
+  // Read volumetric files
+  fs.readdir(volumetricDirPath, (err, filesPath) => {
+    
+    if (err) {
+      console.log('error /simVolumetricFiles: ', err);
+    } 
+
+    // returns array of filePaths e.g:
+    /* 
+      filesPath:  [
+        'netcdf2nimbus/sample_output/site17/01/volumetric/volumetric_1.bson',
+        'netcdf2nimbus/sample_output/site17/01/volumetric/volumetric_2.bson'
+      ]
+    */
+
+    filesPath = filesPath.map(filePath => {
+      return volumetricDirPath + filePath;
+    });
+    
+    // async.map(filesPath, function(filePath, cb) { 
+    //   fs.readFile(filePath, 'utf8', cb);
+    // }, function(err, results) {
+
+    //   if (err) {
+    //     console.log('/simVolumetricFiles: err', err);
+    //   } else {
+    //     console.log(results); 
+    //     res.send(results);
+    //   }
+
+    // });
+
+  });
+
+});
 
 
 // --------------------------------------------------------

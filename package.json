@@ -5,6 +5,7 @@
   "homepage": "./",
   "main": "./electron/main.js",
   "dependencies": {
+    "async": "^3.2.0",
     "axios": "^0.21.1",
     "bson": "^4.2.2",
     "concurrently": "^5.2.0",
@@ -51,7 +52,7 @@
       "build/**/*",
       "node_modules/**/*"
     ],
-    "directories":{
+    "directories": {
       "buildResources": "assets"
     },
     "electronVersion": "4.2.8",

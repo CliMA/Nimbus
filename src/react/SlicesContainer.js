@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import HorizontalSlice from './HorizontalSlice';
 import VerticalSlice from './VerticalSlice';
 import TimelineScrubber from './TimelineScrubber';
-import BoxController from './BoxController'
+import BoxController from './BoxController';
+import axios from 'axios';
 import * as d3 from 'd3';
 
 export default class SlicesContainer extends Component {
@@ -106,6 +107,21 @@ export default class SlicesContainer extends Component {
 
     this.positivify               = this.positivify.bind(this);
     this.handleUpdateTime         = this.handleUpdateTime.bind(this);
+  }
+
+  // --------------------------------------------------------
+  componentDidMount() {
+    axios.get('/simVolumetricFiles', {
+      params: {
+        sim: this.props.selectedDatasets[0]
+      }
+    }).then(res => {
+      // this.setState({
+      //   volumetricData: res.data
+      // })
+    }).catch(e => {
+      console.log('/simVolumetricFiles error: ', e);
+    });
   }
 
   // --------------------------------------------------------
