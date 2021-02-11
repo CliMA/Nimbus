@@ -68,28 +68,13 @@ export default class App extends Component {
       }
     }).then(res => {
       this.setState({
-
         simDiagnosticData: res.data
       })
     }).catch(e => {
       console.log('/simDiagnosticFile error: ', e);
     });
-
-
-
-    axios.get('/simDiagnosticBSON', {
-      params: {
-        sim: this.state.selectedDatasets[0]
-      }
-    }).then(res => {
-      this.setState({
-
-        simDiagnosticBSON: res.data
-      })
-    }).catch(e => {
-      console.log('/simDiagnosticBSON error: ', e);
-    });
   }
+  
 
 
   // --------------------------------------------------------
@@ -143,7 +128,7 @@ export default class App extends Component {
     return (
       <>
         {
-          this.state.simMetaData && this.state.simDiagnosticData && this.state.simDiagnosticBSON ?
+          this.state.simMetaData && this.state.simDiagnosticData ?
             <Viewer
               simDiagnosticData={ this.state.simDiagnosticData }
               simMetaData={ this.state.simMetaData }
