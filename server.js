@@ -90,11 +90,11 @@ function BSON_parse(ds) {
     let dims = struct["size"];
     let buffer = struct["data"]["buffer"];
     if (dims.length == 3) {
-      for (let m=0; m<dims[0]; m++) {
+      for (let m=0; m<dims[2]; m++) {
         let medium_array = [];
         for (let n=0; n<dims[1]; n++) {
           let small_array = [];
-          let bufferlength = dims[2] * SIZE_OF_DOUBLE;
+          let bufferlength = dims[0] * SIZE_OF_DOUBLE;
           for(let j=0; j<bufferlength; j+=SIZE_OF_DOUBLE) {
             let offset = (m*n*bufferlength) + (n*bufferlength) + j;
             let d = buffer.readDoubleLE(offset);
@@ -106,9 +106,9 @@ function BSON_parse(ds) {
       }
     }
     else if (dims.length == 2) {
-      for (let m=0; m<dims[0]; m++) {
+      for (let m=0; m<dims[1]; m++) {
         let small_array = [];
-        let bufferlength = dims[1] * SIZE_OF_DOUBLE;
+        let bufferlength = dims[0] * SIZE_OF_DOUBLE;
         for(let n=0; n<bufferlength; n+=SIZE_OF_DOUBLE) {
           let offset = (m * bufferlength) + n;
           let d = buffer.readDoubleLE(offset);
