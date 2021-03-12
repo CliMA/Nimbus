@@ -109,6 +109,7 @@ function get_volumetric_data(dump_aux, dump_state)
 
     # VARIABLE EXCEPTIONS
 	num_time_steps = size(Dataset(dump_state)["time"])[1]
+	num_altitudes = size(Dataset(dump_state)["z"])[1]
 
 	state_vars = keys(Dataset(dump_state))
 	state_vars = [var for var in state_vars if
@@ -129,25 +130,28 @@ function get_volumetric_data(dump_aux, dump_state)
 
 	all_vol_vars = vcat(state_vars, aux_vars)
 
-	# CREATE EMPTY ARRAY TO HOW DICTIONARY FOR EACH TIME STAMP
+	# CREATE EMPTY ARRAY FOR EACH TIME STAMP
 	time_stamps = []
-
 	for time in 1:num_time_steps
+		# CREATE EMPTY ARRAY FOR EACH ALTITUDE VALUE 
+		altitudes = []
+		for z in 1:num_altitudes
+			vol_data = Dict(var => [] for var in all_vol_vars)
 
-		vol_data = Dict(var => [] for var in all_vol_vars)
+			for var in state_vars
+				temp = ncread(dump_state,var)
+				push!(vol_data[var], temp[:,:,z,time])
+			end
 
-		for var in state_vars
-			temp = ncread(dump_state,var)
-			push!(vol_data[var], temp[:,:,:,time])
+			for var in aux_vars
+				temp = ncread(dump_aux,var)
+				push!(vol_data[var], temp[:,:,z,time])
+			end
+
+			vol_data = Dict(var => vol_data[var][1] for var in all_vol_vars)
+			push!(altitudes, vol_data)
 		end
-
-		for var in aux_vars
-			temp = ncread(dump_aux,var)
-			push!(vol_data[var], temp[:,:,:,time])
-		end
-
-		vol_data = Dict(var => vol_data[var][1] for var in all_vol_vars)
-		push!(time_stamps, vol_data)
+		push!(time_stamps, altitudes)
 	end
 
 	return time_stamps
@@ -372,7 +376,7 @@ function main()
 			exit()
 		end
 
-		println("Converting data...")
+		println("Converting data. This may take some time...")
 
 		site_folder = output_folder * "/site" * parsed_args["site_num"]
 		if !isdir(site_folder)
@@ -383,8 +387,8 @@ function main()
 		diag_target_file = sim_folder * "/_diagnostic.bson"
 	    meta_target_file = sim_folder * "/_meta.json"
 		if vol
-			mkdir(sim_folder * "/volumetric")
 			vol_target_folder = sim_folder * "/volumetric"
+			mkdir(vol_target_folder)
 		end
 
 		#--------------------------------------
@@ -396,7 +400,6 @@ function main()
 		else
 			meta_data = get_meta_data(vol, parsed_args, diagnostic_file_01, diagnostic_file_02)
 		end
-
 	    diagnostic_data = get_diagnostic_data(diagnostic_file_01, diagnostic_file_02)
 
 
@@ -409,21 +412,27 @@ function main()
 
 		#DIAGNOSTIC DATA
 		bson(diag_target_file, diagnostic_data)
-		println("\tconverting diagnostic data...")
+		println("\twriting diagnostic data...")
 
 		#VOLUMETRIC DATA
 		if vol
-			counter = 1
-			println("\tconverting volumetric data...")
+			t_counter = 1
+			println("\twriting volumetric data...")
 			for time_stamp in volumetric_data
-				bson(vol_target_folder * "/volumetric_" * string(counter) * ".bson", time_stamp)
-				println("\t\ttimestamp " * string(counter) * "...")
-				counter+=1
+				folder_name = vol_target_folder * "/t_" * string(t_counter)
+				mkdir(folder_name)
+				a_counter = 1
+				for altitude in time_stamp
+					bson(folder_name * "/a_" * string(a_counter) * ".bson", altitude)
+					a_counter+=1
+				end
+				println("\t\ttimestamp " * string(t_counter) * "...")
+				t_counter+=1
 			end
 		end
 
 		#FINAL PRINT
-		println("\tconsolidating meta data...")
+		println("\twriting meta data...")
 		println("-----------------------------------------------------------------")
 		println("Simulation Site: " * parsed_args["site_num"])
 		println("Simulation ID: " * parsed_args["name"])
