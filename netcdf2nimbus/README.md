@@ -12,7 +12,7 @@ This is a Julia script which relies on the following packages:
 
 To install from Julia repl:
 `using Pkg`
-`Pkg.add([desired package])`
+`Pkg.add("[desired package]")` e.g. `Pkg.add("BSON")`
 
 ## Usage
 netcdf2nimbus.jl has 3 different modes of operation that are selected by command line tags. The tags are:
