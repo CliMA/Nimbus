@@ -130,6 +130,7 @@ export default class App extends Component {
         {
           this.state.simMetaData && this.state.simDiagnosticData ?
             <Viewer
+              selectedDatasets={ this.state.selectedDatasets }
               simDiagnosticData={ this.state.simDiagnosticData }
               simMetaData={ this.state.simMetaData }
               simDiagnosticBSON={ this.state.simDiagnosticBSON }

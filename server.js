@@ -1,10 +1,12 @@
-const express  = require('express');
-const path     = require('path');
-const fs       = require('fs');
-const app      = express();
-const BSON     = require('bson');
-const PORT     = 8080;
-const userPath = 'netcdf2nimbus/sample_output';
+const express        = require('express');
+const path           = require('path');
+const fs             = require('fs');
+const fse            = require('fs-extra');
+const async          = require('async');
+const app            = express();
+const BSON           = require('bson');
+const PORT           = 8080;
+const userPath       = 'netcdf2nimbus/sample_output';
 const SIZE_OF_DOUBLE = 8;
 
 
@@ -18,6 +20,67 @@ app.get('/dbMetadataList', (req, res) => {
   });
 });
 
+// --------------------------------------------------------
+/* At time of writing, we were given simulation data with 
+  only two volumetric files. This call needs to be updated
+  later to handle multiple / larger batch calls as desired.
+*/
+// --------------------------------------------------------
+// Return volumetric data for range of timestamps
+app.get('/volDataForTSRange', async (req, res) => {
+  let sim         = JSON.parse(req.query.sim);
+  let samplingRes = JSON.parse(req.query.samplingRes);
+  let tsRange     = JSON.parse(req.query.tsRange);
+  let tsStarting  = JSON.parse(req.query.tsStarting);
+
+  let volDir = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/volumetric/${ samplingRes }x`;
+
+  let tsRangeData = [];
+
+  // make sure to wait for all timestamps?
+  for (let i = tsStarting; i <= tsRange; i++) {
+    let tsDir = `${ volDir }/t_${ i }/`
+    const a = await getVolDataForTS(tsDir, i)
+    tsRangeData.push(a);
+  }
+
+  // console.log('tsRangeData: ', tsRangeData);
+
+  res.send(tsRangeData);
+})
+
+
+// --------------------------------------------------------
+// Return volumetric data for one timestamp
+async function getVolDataForTS(tsDir, idx) {
+  return await fse.readdir(tsDir)
+    .then(filenames => {
+      return filenames.map(filename => path.join(tsDir, filename))
+    })
+    .then(filepaths => {
+      // console.log(filepaths)
+      return filepaths.map(filepath => fse.readFile(filepath)
+        .then(filecontents => {
+          let ds = BSON.deserialize(filecontents);
+          let parsed_ds = BSON_parse(ds);
+          return parsed_ds;
+        }))
+    }).then(contents => Promise.all(contents))
+    .then(allcontent => {
+      
+      // TESTING ONLY
+      // console.log(allcontent)
+      // fs.writeFile(`test_${idx}.json`, JSON.stringify(allcontent), 'utf8', 
+      // function (err) {
+      //   if (err) {
+      //     return console.log(err);
+      //   }
+      //   console.log("The file was saved!");
+      // }); 
+
+      return allcontent
+    });
+}
 
 // --------------------------------------------------------
 app.get('/simDiagnosticFile', (req, res) => {
@@ -28,8 +91,8 @@ app.get('/simDiagnosticFile', (req, res) => {
     if (err) {
       throw err;
     }
-    ds = BSON.deserialize(data);
-    parsed_ds = BSON_parse(ds);
+    let ds = BSON.deserialize(data);
+    let parsed_ds = BSON_parse(ds);
     res.send(parsed_ds);
   });
 });
