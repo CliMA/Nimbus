@@ -4,6 +4,10 @@ using BSON
 using JSON
 using ArgParse
 
+VOLUMETRIC_VARIABLES = ["ρ","ρu[3]","moisture.ρq_tot","moisture.temperature","moisture.θ_v","moisture.q_liq","moisture.q_ice"]
+DIAGNOSTIC_VARIABLES = []
+SLICES_PER_FILE = 20
+
 function get_args()
     s = ArgParseSettings()
     @add_arg_table! s begin
@@ -105,7 +109,7 @@ function handle_arg_errors(args)
 	end
 end
 
-function get_volumetric_data(dump_aux, dump_state)
+function get_volumetric_data(dump_aux, dump_state, df) #df = downsample_factor
 
     # VARIABLE EXCEPTIONS
 	num_time_steps = size(Dataset(dump_state)["time"])[1]
@@ -116,7 +120,8 @@ function get_volumetric_data(dump_aux, dump_state)
 		var != "x" &&
 		var != "y" &&
 		var != "z" &&
-		var != "time"]
+		var != "time" &&
+		in(var, VOLUMETRIC_VARIABLES)] #delete this line to include all variables
 
 	aux_vars = keys(Dataset(dump_aux))
 	aux_vars = [var for var in aux_vars if
@@ -126,7 +131,8 @@ function get_volumetric_data(dump_aux, dump_state)
 		var != "time" &&
 		var != "coord[1]" &&
 		var != "coord[2]" &&
-		var != "coord[3]"]
+		var != "coord[3]" &&
+		in(var, VOLUMETRIC_VARIABLES)] #delete this line to include all variables
 
 	all_vol_vars = vcat(state_vars, aux_vars)
 
@@ -135,17 +141,17 @@ function get_volumetric_data(dump_aux, dump_state)
 	for time in 1:num_time_steps
 		# CREATE EMPTY ARRAY FOR EACH ALTITUDE VALUE 
 		altitudes = []
-		for z in 1:num_altitudes
+		for z in 1:SLICES_PER_FILE:num_altitudes-SLICES_PER_FILE
 			vol_data = Dict(var => [] for var in all_vol_vars)
 
 			for var in state_vars
 				temp = ncread(dump_state,var)
-				push!(vol_data[var], temp[:,:,z,time])
+				push!(vol_data[var], temp[1:df:end,1:df:end,z:df:z+SLICES_PER_FILE-1,time])
 			end
 
 			for var in aux_vars
 				temp = ncread(dump_aux,var)
-				push!(vol_data[var], temp[:,:,z,time])
+				push!(vol_data[var], temp[1:df:end,1:df:end,z:df:z+SLICES_PER_FILE-1,time])
 			end
 
 			vol_data = Dict(var => vol_data[var][1] for var in all_vol_vars)
@@ -202,7 +208,8 @@ function get_meta_data(vol, parsed_args, core, default, aux=nothing, state=nothi
 	        var != "x" &&
 	        var != "y" &&
 	        var != "z" &&
-			var != "time"]
+			var != "time" &&
+			in(var, VOLUMETRIC_VARIABLES)] #delete this line to include all variables]
 	    dsa_vars = keys(Dataset(aux))
 	    dsa_vars = [var for var in dsa_vars if
 	        var != "time" &&
@@ -211,7 +218,8 @@ function get_meta_data(vol, parsed_args, core, default, aux=nothing, state=nothi
 	        var != "coord[3]" &&
 	        var != "x" &&
 	        var != "y" &&
-	        var != "z"]
+	        var != "z" &&
+			in(var, VOLUMETRIC_VARIABLES)] #delete this line to include all variables]
 
 	    all_vol_vars = vcat(ds_vars, dsa_vars)
 		vol_num_time_stamps = size(Dataset(state)["time"])[1]
@@ -389,13 +397,22 @@ function main()
 		if vol
 			vol_target_folder = sim_folder * "/volumetric"
 			mkdir(vol_target_folder)
+			vfs = [vol_target_folder * "/1x", vol_target_folder * "/2x", vol_target_folder * "/4x", vol_target_folder * "/8x"]
+			for folder in vfs
+				mkdir(folder)
+			end
 		end
 
 		#--------------------------------------
 		#DATA CONVERSION
 		#--------------------------------------
 		if vol
-	    	volumetric_data = get_volumetric_data(dump_aux_file, dump_state_file)
+			volumetric_data = [
+				get_volumetric_data(dump_aux_file, dump_state_file,1),
+				get_volumetric_data(dump_aux_file, dump_state_file,2),
+				get_volumetric_data(dump_aux_file, dump_state_file,4),
+				get_volumetric_data(dump_aux_file, dump_state_file,8)
+				]
 			meta_data = get_meta_data(vol, parsed_args, diagnostic_file_01, diagnostic_file_02, dump_aux_file, dump_state_file)
 		else
 			meta_data = get_meta_data(vol, parsed_args, diagnostic_file_01, diagnostic_file_02)
@@ -416,18 +433,21 @@ function main()
 
 		#VOLUMETRIC DATA
 		if vol
-			t_counter = 1
 			println("\twriting volumetric data...")
-			for time_stamp in volumetric_data
-				folder_name = vol_target_folder * "/t_" * string(t_counter)
-				mkdir(folder_name)
-				a_counter = 1
-				for altitude in time_stamp
-					bson(folder_name * "/a_" * string(a_counter) * ".bson", altitude)
-					a_counter+=1
+			counter = 1
+			for v in volumetric_data
+				t_counter = 1
+				for time_stamp in v
+					folder_name = vfs[counter] * "/t_" * string(t_counter)
+					mkdir(folder_name)
+					a_counter = 1
+					for altitude in time_stamp
+						bson(folder_name * "/set_" * string(a_counter) * ".bson", altitude)
+						a_counter+=1
+					end
+					t_counter+=1
 				end
-				println("\t\ttimestamp " * string(t_counter) * "...")
-				t_counter+=1
+				counter+=1
 			end
 		end
 
@@ -457,7 +477,7 @@ function main()
 	# PHASE 2. COMPILE DATABASE (FOR MODES --db_add and --db_compile)
 	#--------------------------------------
 	if parsed_args["db_compile"] || parsed_args["db_add"]
-		println("Outputting nimbus_meta.json...")
+		println("Writing database.json...")
 		database = compile_database(output_folder)
 		nm = JSON.json(database)
 		open("database.json", "w") do x
