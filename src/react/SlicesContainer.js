@@ -111,16 +111,19 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   componentDidMount() {
-    axios.get('/simVolumetricFiles', {
+
+    axios.get('/volDataForTSRange', {
       params: {
-        sim: this.props.selectedDatasets[0]
+        sim: this.props.selectedDatasets[0],
+        samplingRes: 2,
+        tsRange: 2,
+        tsStarting: 1  
       }
     }).then(res => {
-      // this.setState({
-      //   volumetricData: res.data
-      // })
+      console.log(res);
+
     }).catch(e => {
-      console.log('/simVolumetricFiles error: ', e);
+      console.log('/volDataForTSRange error: ', e);
     });
   }
 
