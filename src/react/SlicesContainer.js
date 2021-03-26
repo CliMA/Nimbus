@@ -55,7 +55,7 @@ export default class SlicesContainer extends Component {
     "moisture.θ_v"
   ];
 
-  // contour_var_opts = this.props.simMetaData["volumetric_variables"];
+  var_opts = this.props.simMetaData["volumetric_variables"];
 
   // --------------------------------------------------------
   // Utilities
@@ -121,7 +121,8 @@ export default class SlicesContainer extends Component {
       }
     }).then(res => {
       console.log(res);
-
+      console.log(this.compile_vol_data(res));
+      console.log(this.boxes);
     }).catch(e => {
       console.log('/volDataForTSRange error: ', e);
     });
@@ -137,6 +138,26 @@ export default class SlicesContainer extends Component {
     } else {
       return data;
     }
+  }
+
+  // --------------------------------------------------------
+  compile_vol_data(vol_data) {
+
+    let boxes = {};
+    for (let m=0; m<this.var_opts.length; m++) {
+      let k = this.var_opts[m];
+      let var_data = [];
+      for (let i=0; i<vol_data.data.length; i++) {
+        let s = vol_data.data[i];
+        let time_stamp = [];
+        for (let j=0; j<s.length; j++) {
+          time_stamp = time_stamp.concat(s[j][k]);
+        }
+        var_data.push(time_stamp);
+      }
+      boxes[k] = var_data;
+    }
+    return boxes;
   }
 
   // --------------------------------------------------------
