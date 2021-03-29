@@ -17,9 +17,9 @@ function VerticalSlice({
   // this variable corresponds to the dimensions of the 2D array for the contour
   // ry corresponds to the desired spatial dimensions
   const v_shape = {
-    x: 65,
-    y: 76,
-    ry: 30
+    x: dims.x / 100,
+    y: boxes_span[displayedContour].length,
+    ry: dims.z / 100
   };
 
   // --------------------------------------------------------
@@ -59,7 +59,7 @@ function VerticalSlice({
       {type, value, coordinates: coordinates.map(rings => (
         rings.map(points => (
           points.map(([x, y]) => ([
-            x*scale, y*scale*30/76
+            x*scale, y*scale*this.v_shape.ry/this.v_shape.y
           ]))
         ))
       ))}

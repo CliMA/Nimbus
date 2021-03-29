@@ -8,52 +8,18 @@ import * as d3 from 'd3';
 
 export default class SlicesContainer extends Component {
 
-  // --------------------------------------------------------
-  // BOXES - the data structure which houses the 3D data. This data is currently all
-  // loaded in at the beginning, and as such we can only load a relatively small number of
-  // time steps - in future these should be accessed dynamically - so that full simulation
-  // ranges can be accessed.
-  // --------------------------------------------------------
+
   start_time_stamp = 100
+  
+  // empty variable that volumetric data gets assigned to in ComponentDidMount()
+  // probably a better way to do this
+  boxes;
 
-  boxes = {
-    "moisture.ρq_tot"     : this.props.BOMEX_DATA["moisture.ρq_tot"],
-    "ρu[1]"               : this.props.BOMEX_DATA["ρu[1]"],
-    "ρu[2]"               : this.props.BOMEX_DATA["ρu[2]"],
-    "ρu[3]"               : this.props.BOMEX_DATA["ρu[3]"],
-    "ρ"                   : this.props.BOMEX_DATA["ρ"],
-    "ρe"                  : this.props.BOMEX_DATA["ρe"],
-    "moisture.q_liq"      : this.props.BOMEX_AUX_DATA["moisture.q_liq"],
-    "moisture.temperature": this.props.BOMEX_AUX_DATA["moisture.temperature"],
-    "moisture.θ_v"        : this.props.BOMEX_AUX_DATA["moisture.θ_v"]
-  }
-
-  // --------------------------------------------------------
-  // Dictionaries for variable queries
-  // --------------------------------------------------------
   dims = {
-    "x" : this.props.BOMEX_coords.x[0],
-    "y" : this.props.BOMEX_coords.y[0],
-    "z" : this.props.BOMEX_coords.z[0]
+    "x" : this.props.simMetaData["x_extent"],
+    "y" : this.props.simMetaData["y_extent"],
+    "z" : this.props.simMetaData["z_extent"]
   };
-
-  // dims = {
-  //   "x" : this.props.simMetaData["x_extent"],
-  //   "y" : this.props.simMetaData["y_extent"],
-  //   "z" : this.props.simMetaData["z_extent"]
-  // };
-
-  contour_var_opts = [
-    'ρu[1]',
-    'ρu[2]',
-    'ρu[3]',
-    'ρ',
-    'ρe',
-    'moisture.ρq_tot',
-    'moisture.q_liq',
-    'moisture.temperature',
-    "moisture.θ_v"
-  ];
 
   var_opts = this.props.simMetaData["volumetric_variables"];
 
@@ -80,25 +46,11 @@ export default class SlicesContainer extends Component {
 
     this.state = {
 
-      // frames 100 - 104
-      timestampRange: {
-        start: {
-          hrs: 3,
-          min: 20,
-          sec: 0
-        },
-        end : {
-          hrs: 3,
-          min: 30,
-          sec: 0
-        }
-      },
+      currentTime: 0,
 
-      currentTime: 2,
+      timeRange: [0, 1], // number of files loaded in
 
-      timeRange: [0, 4], // number of files loaded in
-
-      timeStep: 120,
+      timeStep: 0,
 
       // increment for time scrubber
       timeIncrement: 1,
@@ -120,8 +72,7 @@ export default class SlicesContainer extends Component {
         tsStarting: 1  
       }
     }).then(res => {
-      console.log(res);
-      console.log(this.compile_vol_data(res));
+      this.boxes = this.compile_vol_data(res);
       console.log(this.boxes);
     }).catch(e => {
       console.log('/volDataForTSRange error: ', e);
@@ -181,7 +132,7 @@ export default class SlicesContainer extends Component {
               <svg className='globe-icon-svg' width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9.99994 0C4.48094 0 0 4.4809 0 9.99992C0 15.4242 4.32942 19.8396 9.71768 19.9898C9.81036 19.9992 9.90552 19.9998 9.99994 19.9998C10.0944 19.9998 10.1895 19.9998 10.2822 19.9898C15.6705 19.8396 19.9999 15.4242 19.9999 9.99992C19.9999 4.4809 15.5189 0 9.99994 0ZM9.67736 0.675419V5.48384H6.05841C6.2768 4.67487 6.54631 3.9335 6.86486 3.29637C7.63321 1.75967 8.63024 0.833966 9.67736 0.675419ZM10.3225 0.675419C11.3696 0.833966 12.3666 1.75967 13.135 3.29637C13.4536 3.9335 13.7231 4.67487 13.9415 5.48384H10.3225V0.675419ZM7.8326 0.907252C7.24296 1.42754 6.72173 2.14112 6.29028 3.00401C5.92735 3.72985 5.62864 4.57239 5.39313 5.48384H1.80444C3.06021 3.21027 5.23845 1.52222 7.8326 0.907252ZM12.1673 0.907252C14.7614 1.52222 16.9397 3.21027 18.1954 5.48384H14.6067C14.3712 4.57239 14.0725 3.72985 13.7096 3.00401C13.2781 2.14112 12.7569 1.42754 12.1673 0.907252ZM1.48186 6.12899H5.23184C4.99687 7.22792 4.86916 8.42288 4.84874 9.67734H0.655222C0.698738 8.41498 0.986994 7.21583 1.48186 6.12899V6.12899ZM5.89712 6.12899H9.67736V9.67734H5.4939C5.51519 8.41488 5.65471 7.21696 5.89712 6.12899ZM10.3225 6.12899H14.1028C14.3452 7.21696 14.4846 8.41488 14.506 9.67734H10.3225V6.12899ZM14.768 6.12899H18.518C19.0129 7.21583 19.3011 8.41498 19.3447 9.67734H15.1511C15.1308 8.42288 15.003 7.22792 14.768 6.12899ZM0.655222 10.3225H4.84874C4.86907 11.5742 4.9979 12.7759 5.23184 13.8709H1.48186C0.988413 12.7843 0.697802 11.5841 0.655222 10.3225V10.3225ZM5.4939 10.3225H9.67736V13.8709H5.89712C5.65448 12.7844 5.51513 11.5858 5.4939 10.3225ZM10.3225 10.3225H14.506C14.4847 11.5858 14.3454 12.7844 14.1028 13.8709H10.3225V10.3225ZM15.1511 10.3225H19.3447C19.3021 11.5841 19.0115 12.7843 18.518 13.8709H14.768C15.002 12.7759 15.1309 11.5742 15.1511 10.3225ZM1.80444 14.516H5.39313C5.62871 15.4263 5.92709 16.2595 6.29028 16.9858C6.72396 17.8532 7.24928 18.5794 7.84269 19.1027C5.24142 18.489 3.06108 16.7963 1.80444 14.516V14.516ZM6.05841 14.516H9.67736V19.3346C8.63024 19.1745 7.63321 18.2302 6.86486 16.6935C6.54631 16.0563 6.2768 15.3232 6.05841 14.516ZM10.3225 14.516H13.9415C13.7231 15.3232 13.4536 16.0563 13.135 16.6935C12.3666 18.2302 11.3696 19.1745 10.3225 19.3346V14.516ZM14.6067 14.516H18.1954C16.9388 16.7963 14.7585 18.489 12.1572 19.1027C12.7506 18.5794 13.2759 17.8532 13.7096 16.9858C14.0728 16.2595 14.3712 15.4263 14.6067 14.516V14.516Z" fill="#ECECEC"/>
               </svg>
-              <span className='section-header-label'>LES - BOMEX_01</span>
+              <span className='section-header-label'>LES</span>
             </div>
 
             {/* Slice header tabs */}
@@ -229,6 +180,7 @@ export default class SlicesContainer extends Component {
                 current_vertical_axis= { this.props.currentVerticalAxis }
                 x_slice_value= { this.props.currentVerticalX }
                 y_slice_value= { this.props.currentVerticalY }
+                dims = { this.dims }
               />
 
 
@@ -302,8 +254,8 @@ export default class SlicesContainer extends Component {
                 <HorizontalSlice
                   current_time={ this.state.currentTime }
                   altitude={ this.props.currentAltitude }
-                  contour_var={ this.contour_var_opts[2] }
-                  contour_var_opts={ this.contour_var_opts }
+                  contour_var={ this.var_opts[0] }
+                  contour_var_opts={ this.var_opts }
                   boxes_span={ this.boxes }
                   positivify={ this.positivify }
                   linearColorScale={ this.linearColorScale }
@@ -313,8 +265,8 @@ export default class SlicesContainer extends Component {
                 <HorizontalSlice
                   current_time={ this.state.currentTime }
                   altitude={ this.props.currentAltitude }
-                  contour_var={ this.contour_var_opts[5] }
-                  contour_var_opts={ this.contour_var_opts }
+                  contour_var={ this.var_opts[0] }
+                  contour_var_opts={ this.var_opts }
                   boxes_span={ this.boxes }
                   positivify={ this.positivify }
                   linearColorScale={ this.linearColorScale }
@@ -324,8 +276,8 @@ export default class SlicesContainer extends Component {
                 <HorizontalSlice
                   current_time={ this.state.currentTime }
                   altitude={ this.props.currentAltitude }
-                  contour_var={ this.contour_var_opts[7] }
-                  contour_var_opts={ this.contour_var_opts }
+                  contour_var={ this.var_opts[0] }
+                  contour_var_opts={ this.var_opts }
                   boxes_span={ this.boxes }
                   positivify={ this.positivify }
                   linearColorScale={ this.linearColorScale }
@@ -338,8 +290,8 @@ export default class SlicesContainer extends Component {
                   currentVerticalX={ this.props.currentVerticalX }
                   currentVerticalY={ this.props.currentVerticalY }
                   current_time={ this.state.currentTime }
-                  contour_var={ this.contour_var_opts[2] }
-                  contour_var_opts={ this.contour_var_opts }
+                  contour_var={ this.var_opts[0] }
+                  contour_var_opts={ this.var_opts }
                   boxes_span={ this.boxes }
                   positivify={ this.positivify }
                   linearColorScale={ this.linearColorScale }
@@ -350,8 +302,8 @@ export default class SlicesContainer extends Component {
                   currentVerticalX={ this.props.currentVerticalX }
                   currentVerticalY={ this.props.currentVerticalY }
                   current_time={ this.state.currentTime }
-                  contour_var={ this.contour_var_opts[5] }
-                  contour_var_opts={ this.contour_var_opts }
+                  contour_var={ this.var_opts[0] }
+                  contour_var_opts={ this.var_opts }
                   boxes_span={ this.boxes }
                   positivify={ this.positivify }
                   linearColorScale={ this.linearColorScale }
