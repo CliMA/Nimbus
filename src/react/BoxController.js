@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import Vertex from './Vertex.js';
 
-function BoxController({slice_axis, altitude, current_vertical_axis, x_slice_value, y_slice_value}) {
+function BoxController({slice_axis, altitude, current_vertical_axis, x_slice_value, y_slice_value, dims}) {
 
   // --------------------------------------------------------
   // many of the values in this function are specific to this simulation,
@@ -10,15 +10,24 @@ function BoxController({slice_axis, altitude, current_vertical_axis, x_slice_val
   // --------------------------------------------------------
   // skeleton
   // --------------------------------------------------------
+  const bounds = {
+    "x": dims.x/2000,
+    "nx" : dims.x/-2000,
+    "y": dims.y/2000,
+    "ny": dims.y/-2000,
+    "z": dims.z/2000,
+    "nz": dims.z/-2000
+  };
+
   const vertices = [
-    new Vertex(-3.2, -1.5, -3.2), // Front-Bottom-Left
-    new Vertex( 3.2, -1.5, -3.2), // Front-Bottom-Right
-    new Vertex(-3.2, -1.5,  3.2), // Rear-Bottom-Left
-    new Vertex( 3.2, -1.5,  3.2), // Rear-Bottom-Right
-    new Vertex(-3.2,  1.5, -3.2), // Front-Top-Left
-    new Vertex( 3.2,  1.5, -3.2), // Front-Top-Right
-    new Vertex(-3.2,  1.5,  3.2), // Rear-Top-Left
-    new Vertex( 3.2,  1.5,  3.2)  // Rear-Top-Right
+    new Vertex(bounds.nx, bounds.nz, bounds.ny), // Front-Bottom-Left
+    new Vertex( bounds.x, bounds.nz, bounds.ny), // Front-Bottom-Right
+    new Vertex(bounds.nx, bounds.nz,  bounds.y), // Rear-Bottom-Left
+    new Vertex( bounds.x, bounds.nz,  bounds.y), // Rear-Bottom-Right
+    new Vertex(bounds.nx,  bounds.z, bounds.ny), // Front-Top-Left
+    new Vertex( bounds.x,  bounds.z, bounds.ny), // Front-Top-Right
+    new Vertex(bounds.nx,  bounds.z,  bounds.y), // Rear-Top-Left
+    new Vertex( bounds.x,  bounds.z,  bounds.y)  // Rear-Top-Right
   ];
   const faces = [
     new Polygon([vertices[0], vertices[1], vertices[5], vertices[4]]), // Front
@@ -46,27 +55,27 @@ function BoxController({slice_axis, altitude, current_vertical_axis, x_slice_val
     if (axis === "HORIZONTAL") {
       scaled_val = scale_slice_value("z",alt);
       slice_vertices = [
-        new Vertex(-3.2, scaled_val, -3.2), // Front-Left
-        new Vertex( 3.2, scaled_val, -3.2), // Front-Right
-        new Vertex(-3.2, scaled_val,  3.2), // Rear-Left
-        new Vertex( 3.2, scaled_val,  3.2) // Rear-Right
+        new Vertex(bounds.nx, scaled_val, bounds.ny), // Front-Left
+        new Vertex( bounds.x, scaled_val, bounds.ny), // Front-Right
+        new Vertex(bounds.nx, scaled_val,  bounds.y), // Rear-Left
+        new Vertex( bounds.x, scaled_val,  bounds.y) // Rear-Right
       ];
     } else {
       if (vert_axis === "X") {
         scaled_val = scale_slice_value("x",x_val);
         slice_vertices = [
-          new Vertex(scaled_val, -1.5, -3.2), // Front-Bottom
-          new Vertex(scaled_val, -1.5,  3.2), // Rear-Bottom
-          new Vertex(scaled_val,  1.5, -3.2), // Front-Top
-          new Vertex(scaled_val,  1.5,  3.2)  // Rear-Top
+          new Vertex(scaled_val, bounds.nz, bounds.ny), // Front-Bottom
+          new Vertex(scaled_val, bounds.nz,  bounds.y), // Rear-Bottom
+          new Vertex(scaled_val,  bounds.z, bounds.ny), // Front-Top
+          new Vertex(scaled_val,  bounds.z,  bounds.y)  // Rear-Top
         ];
       } else {
         scaled_val = scale_slice_value("y",y_val);
         slice_vertices = [
-          new Vertex(-3.2, -1.5, scaled_val), // Front-Bottom-Left
-          new Vertex( 3.2, -1.5, scaled_val), // Front-Bottom-Right
-          new Vertex(-3.2,  1.5, scaled_val), // Front-Top-Left
-          new Vertex( 3.2,  1.5, scaled_val)  // Front-Top-Right
+          new Vertex(bounds.nx, bounds.nz, scaled_val), // Front-Bottom-Left
+          new Vertex( bounds.x, bounds.nz, scaled_val), // Front-Bottom-Right
+          new Vertex(bounds.nx,  bounds.z, scaled_val), // Front-Top-Left
+          new Vertex( bounds.x,  bounds.z, scaled_val)  // Front-Top-Right
         ]
       }
     }
@@ -76,9 +85,9 @@ function BoxController({slice_axis, altitude, current_vertical_axis, x_slice_val
   // scales spacial value to correct size for this model
   const scale_slice_value = (axis, value) => {
     if (axis === "z") {
-      return (value/1000) - 1.5;
+      return (value/1000) - bounds.z;
     } else {
-      return (value/1000) - 3.2;
+      return (value/1000) - bounds.x;
     }
   }
 
@@ -144,7 +153,7 @@ function BoxController({slice_axis, altitude, current_vertical_axis, x_slice_val
   	context.strokeStyle = '#666666';
     context.fillStyle = '#666666';
 
-  	const modelSize = canvasObj.width / 8;
+  	const modelSize = canvasObj.width / 10;
   	const scale = modelSize / 2;
   	const c = 0.2;
   	const fx = oblique.gx(scale, c);

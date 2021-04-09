@@ -187,6 +187,17 @@ label.simulation-id-label {
   margin-left: 20px;
 }
 
+#slices-loader {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#slices-loader-text {
+  color: white;
+}
+
 #slices-container {
   height: 54vh;
 }
@@ -197,7 +208,6 @@ label.simulation-id-label {
 
 #slices-container,
 #diagnostic-plots-container {
-
   background: var(--bg-dark);
 }
 
@@ -528,7 +538,7 @@ div.tick {
   position: absolute;
   left: 0;
   padding-left: 20px;
-  bottom: 42px;
+  bottom: 60px;
 }
 
 .plot {

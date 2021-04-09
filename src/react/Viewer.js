@@ -2,37 +2,37 @@ import React, { Component } from 'react';
 import SlicesContainer from './SlicesContainer';
 import DiagnosticPlotsContainer from './DiagnosticPlotsContainer';
 
-// SlicesContainer data
-import BOMEX_AUX_DATA from './data/BOMEX_3D_aux_100-104'
-import BOMEX_DATA from './data/BOMEX_3D_100-104'
-import BOMEX_coords from './data/BOMEX_3D_coord_data';
-
-
 export default class Viewer extends Component {
 
   constructor(props) {
     super(props);
 
+    // boolean for if volumetric data exists @ this.props.hasVolumetricData
+
     // --------------------------------------------------------
     // global state variables and funcions that get passed between components
     // --------------------------------------------------------
+
+
     this.state = {
+
+
       // Horizontal
       currentSliceType: 'HORIZONTAL',
-      currentAltitude: 1200,
+      currentAltitude: this.props.simMetaData["z_extent"] / 2,
 
       // these two can go
-      horizontalSliceRange: [0, 3000],
-      horizontalIncrement: 40,
+      horizontalSliceRange: [0, this.props.simMetaData["z_extent"]],
+      horizontalIncrement: this.props.simMetaData["z"][1] - this.props.simMetaData["z"][0],
 
       // Vertical
       currentVerticalAxis: 'X',
-      currentVerticalX: 3000,
-      currentVerticalY: 3000,
+      currentVerticalX: this.props.simMetaData["x_extent"] / 2,
+      currentVerticalY: this.props.simMetaData["y_extent"] / 2,
 
       // these two can go
-      verticalSliceRange: [0, 6400],
-      verticalIncrement: 100,
+      verticalSliceRange: [0, this.props.simMetaData["x_extent"]],
+      verticalIncrement: this.props.simMetaData["x"][1] - this.props.simMetaData["x"][0],
     }
 
     this.handleUpdateAltitude     = this.handleUpdateAltitude.bind(this);
@@ -76,14 +76,11 @@ export default class Viewer extends Component {
   render() {
     return (
       <div className="Viewer">
+        {/* Don't render if !this.props.hasVolumetricData*/}
         <SlicesContainer
 
           selectedDatasets={ this.props.selectedDatasets }
           simMetaData={ this.props.simMetaData }
-
-          BOMEX_AUX_DATA={ BOMEX_AUX_DATA }
-          BOMEX_DATA={ BOMEX_DATA }
-          BOMEX_coords={ BOMEX_coords }
 
           horizontalSliceRange={ this.state.horizontalSliceRange }
           horizontalIncrement={ this.state.horizontalIncrement }

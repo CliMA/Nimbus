@@ -4,8 +4,9 @@ using BSON
 using JSON
 using ArgParse
 
+# lists to limit variables for testing
 VOLUMETRIC_VARIABLES = ["ρ","ρu[3]","moisture.ρq_tot","moisture.temperature","moisture.θ_v","moisture.q_liq","moisture.q_ice"]
-DIAGNOSTIC_VARIABLES = []
+# DIAGNOSTIC_VARIABLES = []
 SLICES_PER_FILE = 20
 
 function get_args()

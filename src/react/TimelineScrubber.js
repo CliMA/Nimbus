@@ -6,7 +6,7 @@ import React from 'react';
 // this file handles the timeline scrubber that applies to the slices view
 // --------------------------------------------------------
 function TimelineScrubber({
-  currentTime, timeRange, timeIncrement, handleUpdateTime
+  timeStamps, currentTime, timeRange, timeIncrement, handleUpdateTime
 }) {
 
   let emptyTimeArr = [];
@@ -26,17 +26,18 @@ function TimelineScrubber({
   }
 
   // --------------------------------------------------------
-  const convertToTimestamp = ( start_index, num ) => {
-    var hrs = ('0' + Math.floor((start_index + num) * 2 / 60)).slice(-2);
-    var mins = ('0' + (start_index + num) * 2 % 60).slice(-2);
-    var string = `${hrs}:${mins}:00`
+  const convertToTimestamp = ( index ) => {
+    var str = timeStamps[index];
+    console.log(timeStamps);
+    var t = str.indexOf("T");
+    var st = str.slice(t+1,t+9);
 
-    return string;
+    return st;
   }
 
-  const startTimeStamp = convertToTimestamp(100, timeRange[0]);
-  const currentTimeStamp = convertToTimestamp(100, currentTime);
-  const endTimeStamp = convertToTimestamp(100, timeRange[1]);
+  const startTimeStamp = convertToTimestamp(0);
+  const currentTimeStamp = convertToTimestamp(currentTime);
+  const endTimeStamp = convertToTimestamp(timeStamps.length - 1);
 
   // --------------------------------------------------------
   return (

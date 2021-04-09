@@ -134,6 +134,7 @@ export default class App extends Component {
               simDiagnosticData={ this.state.simDiagnosticData }
               simMetaData={ this.state.simMetaData }
               simDiagnosticBSON={ this.state.simDiagnosticBSON }
+              hasVolumetricData= { this.state.simMetaData["vol"] }
             /> :
           <div id='data-selection-container'>
             <div id='user-settings-modal' className={ this.state.userSettingsModalOpen ? 'visible' : '' }>
