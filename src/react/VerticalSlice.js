@@ -5,31 +5,35 @@ import Dropdown from './Dropdown';
 function VerticalSlice({
   currentVerticalAxis, currentVerticalX, currentVerticalY,
 	current_time, contour_var, contour_var_opts,
-	boxes_span, positivify, linearColorScale, dims }) {
+	boxes_span, positivify, linearColorScale, dims, res }) {
 
   // --------------------------------------------------------
   // sets dimensions and displayed variable
   // --------------------------------------------------------
   const [displayedContour, setDisplayedContour] = useState(contour_var);
 
-  const pixelScale = window.innerHeight * 0.008;
+  const axis_ratio = dims.z / dims.x;
 
   // this variable corresponds to the dimensions of the 2D array for the contour
   // ry corresponds to the desired spatial dimensions
   const v_shape = {
-    x: dims.x / 100,
-    y: boxes_span[displayedContour].length,
-    ry: dims.z / 100
+    x: boxes_span[displayedContour][0][0].length,
+    y: boxes_span[displayedContour][0].length,
+    ry: boxes_span[displayedContour][0][0].length * axis_ratio
   };
+
+  console.log(v_shape);
+  const pixelScale = window.innerHeight * 1/v_shape.x  * 0.4;
+  const sample_rate = dims.x / boxes_span[displayedContour][0][0].length + 1;
 
   // --------------------------------------------------------
   // array to be displayed
   // --------------------------------------------------------
   const display_array = () => {
     if (currentVerticalAxis === 'Y') {
-      return d3.zip(...boxes_span[displayedContour][current_time].map(d => d3.zip(...d)))[currentVerticalY/100].reverse();
+      return d3.zip(...boxes_span[displayedContour][current_time].map(d => d3.zip(...d)))[parseInt(currentVerticalY/sample_rate)].reverse();
     } else {
-      return d3.zip(...boxes_span[displayedContour][current_time])[currentVerticalX/100].reverse();
+      return d3.zip(...boxes_span[displayedContour][current_time])[parseInt(currentVerticalX/sample_rate)].reverse();
     }
   }
 
@@ -48,8 +52,8 @@ function VerticalSlice({
 
   // uses d3 scale to decide colors for each contour and set spatial scales
   const v_contour_color = d3.scaleSequentialLog(v_value_range, linearColorScale);
-  const v_cx = d3.scaleLinear(d3.extent(dims.y), [0, v_shape.x * pixelScale]);
-  const v_cy = d3.scaleLinear(d3.extent(dims.z).reverse(), [0, v_shape.ry * pixelScale]);
+  const v_cx = d3.scaleLinear([0, dims.y], [0, v_shape.x * pixelScale]);
+  const v_cy = d3.scaleLinear([dims.z, 0], [0, v_shape.ry * pixelScale]);
 
   // --------------------------------------------------------
   // Scale function for cooridinates in contour
@@ -59,7 +63,7 @@ function VerticalSlice({
       {type, value, coordinates: coordinates.map(rings => (
         rings.map(points => (
           points.map(([x, y]) => ([
-            x*scale, y*scale*this.v_shape.ry/this.v_shape.y
+            x*scale, y*scale*v_shape.ry/v_shape.y
           ]))
         ))
       ))}
@@ -114,17 +118,19 @@ function VerticalSlice({
 
     // creates svg element for x and y axes
     const svg_x = d3.select(contourX_AxisRef.current)
-      .attr('width', pixelScale * v_shape.x)
-      .attr('height', 22);
+      .attr('width', pixelScale * v_shape.x + 10)
+      .attr('height', 22)
+      .attr("transform", `translate(10,-5)`);
       svg_x.selectAll("*").remove();
 
       svg_x.append("g")
-        .attr("transform", `translate(-5,5)`)
+        .attr("transform", `translate(-5,0)`)
         .call(d3.axisBottom(v_cx).ticks(v_shape.x/(pixelScale * 2)));
 
     const svg_y = d3.select(contourY_AxisRef.current)
       .attr('width', 40)
-      .attr('height', pixelScale * v_shape.ry);
+      .attr('height', pixelScale * v_shape.ry + 10)
+      .attr("transform", `translate(0,-5)`);
       svg_y.selectAll("*").remove();
 
       svg_y.append("g")

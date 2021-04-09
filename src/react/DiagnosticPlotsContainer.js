@@ -16,6 +16,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
       extentsOn : true,
       compareOn : false,
 
+      timeStamps : this.props.simMetaData["diagnostic_time_stamps"],
       // sets start range for scrubber to be the whole domain
       custom_range : {
         left: 0,
@@ -30,57 +31,12 @@ export default class DiagnosticPlotsContainer extends React.Component {
     this.handleUpdateInterval = this.handleUpdateInterval.bind(this);
     this.handleChangeDropdownVar = this.handleChangeDropdownVar.bind(this)
   }
-
+  //possible variables
   timeline_alt_vars = this.props.simMetaData["diagnostic_variables"]
-  // variable lists for dropdowns
-  // OLD
-  // timeline_alt_vars = [
-  //   "tke",
-  //   "cld_base",
-  //   "cld_cover",
-  //   "cld_top",
-  //   "u",
-  //   "v",
-  //   "w",
-  //   "avg_rho",
-  //   "rho",
-  //   "qt",
-  //   "ql",
-  //   "thv",
-  //   "thl",
-  //   "temp",
-  //   "pres",
-  //   "thd",
-  //   "ei",
-  //   "et",
-  //   "ht",
-  //   "hi",
-  //   "w_ht_sgs",
-  //   "qv",
-  //   "w_qt_sgs",
-  //   "var_u",
-  //   "var_v",
-  //   "var_w",
-  //   "w3",
-  //   "tke",
-  //   "var_qt",
-  //   "var_thl",
-  //   "var_ei",
-  //   "cov_w_u",
-  //   "cov_w_v",
-  //   "cov_w_rho",
-  //   "cov_w_qt",
-  //   "cov_w_ql",
-  //   "cov_w_qv",
-  //   "cov_w_thd",
-  //   "cov_w_thv",
-  //   "cov_w_thl",
-  //   "cov_w_ei",
-  //   "cov_qt_thl",
-  //   "cov_qt_ei",
-  //   "cld_frac"
-  // ];
 
+
+  // variables displayed in drop downs (temporary)
+  // replace when scroll is added to the selection menu
   default_timeline_alt_vars = [
     "tke",
     "cld_frac",
@@ -289,6 +245,7 @@ export default class DiagnosticPlotsContainer extends React.Component {
         </div>
         <div id='alt-var-scrubber-container'>
           <AltVariableScrubber
+            timeStamps= { this.state.timeStamps }
             currentAltVar={ this.state.currentAltVar }
             handleUpdateInterval={ this.handleUpdateInterval }
             customRange={ this.state.custom_range }

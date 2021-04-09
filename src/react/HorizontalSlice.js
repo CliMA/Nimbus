@@ -11,15 +11,17 @@ function HorizontalSlice({
   // --------------------------------------------------------
   const [displayedContour, setDisplayedContour] = useState(contour_var)
 
-  const pixelScale = window.innerHeight * 0.00475;
-
   const z_sample_rate = dims.z / boxes_span[displayedContour][0].length;
 
   // this variable corresponds to the dimensions of the 2D array for the contour
   const h_shape = {
-    x: dims.x / 100,
-    y: dims.y / 100
+    x: boxes_span[displayedContour][0][0].length,
+    y: boxes_span[displayedContour][0][0][0].length
   };
+
+  const pixelScale = window.innerHeight * 1/h_shape.x * .3;
+
+  console.log(h_shape);
 
   // --------------------------------------------------------
   // retrieves the arrays for the slices from the 3D data - 'full array' variables are
@@ -44,8 +46,8 @@ function HorizontalSlice({
   const contour_color = d3.scaleSequentialLog(value_range, linearColorScale)
 
   // d3 scales used to space out data points
-  const cx = d3.scaleLinear(d3.extent(dims.x), [0, h_shape.x * pixelScale])
-  const cy = d3.scaleLinear(d3.extent(dims.y), [h_shape.y * pixelScale, 0]);
+  const cx = d3.scaleLinear([0,dims.x], [0, h_shape.x * pixelScale])
+  const cy = d3.scaleLinear([0,dims.y], [h_shape.y * pixelScale, 0]);
 
   // --------------------------------------------------------
   // this function is not used for horizontal slicing, because the ratio of x to y
@@ -113,25 +115,34 @@ function HorizontalSlice({
 
     context.restore();
 
+    const xAxis = d3.axisBottom()
+      .scale(cx)
+      .ticks(4)
+
+    const yAxis = d3.axisLeft()
+      .scale(cy)
+      .ticks(4)
+
     // creates svg element for x and y axes
     const svg_x = d3.select(contourX_AxisRef.current)
-      .attr('width', pixelScale * h_shape.x)
-      .attr('height', 22);
+      .attr('width', pixelScale * h_shape.x + 10)
+      .attr('height', 22)
+      .attr("transform", `translate(10,-5)`);
       svg_x.selectAll("*").remove();
 
       svg_x.append("g")
-        .attr("transform", `translate(-5,5)`)
-        .call(d3.axisBottom(cx).ticks(h_shape.x/(pixelScale * 4)));
+        .attr("transform", `translate(-5,0)`)
+        .call(xAxis);
 
     const svg_y = d3.select(contourY_AxisRef.current)
       .attr('width', 40)
-      .attr('height', pixelScale * h_shape.y);
+      .attr('height', pixelScale * h_shape.y + 10)
+      .attr("transform", `translate(0,-5)`);
       svg_y.selectAll("*").remove();
 
       svg_y.append("g")
         .attr("transform", `translate(35,5)`)
-        .call(d3.axisLeft(cy).ticks(h_shape.y/(pixelScale * 4)));
-
+        .call(yAxis);
   });
   // --------------------------------------------------------
   // this section draws the color legend - the colors themselves are rendered

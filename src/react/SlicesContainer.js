@@ -8,7 +8,11 @@ import * as d3 from 'd3';
 
 export default class SlicesContainer extends Component {
 
-  start_time_stamp = 100;
+  // 1 for full res
+  // 2 for half res
+  // 4 for quarter res
+  // 8 for eighth res
+  data_resolution = 2;
   
   dims = {
     "x" : this.props.simMetaData["x_extent"],
@@ -40,9 +44,9 @@ export default class SlicesContainer extends Component {
     super(props);
 
     this.state = {
+      timeStamps: this.props.simMetaData["volumetric_time_stamps"],
       currentTime: 0,
-      timeRange: [0, 1], // number of files loaded in
-      timeStep: 0,
+      timeRange: [0, this.props.simMetaData["volumetric_time_stamps"].length - 1], // number of files loaded in
       timeIncrement: 1, // increment for time scrubber
     };
 
@@ -56,7 +60,7 @@ export default class SlicesContainer extends Component {
     axios.get('/volDataForTSRange', {
       params: {
         sim: this.props.selectedDatasets[0],
-        samplingRes: 2,
+        samplingRes: this.data_resolution,
         tsRange: 2,
         tsStarting: 1  
       }
@@ -192,6 +196,7 @@ export default class SlicesContainer extends Component {
           positivify={ this.positivify }
           linearColorScale={ this.linearColorScale }
           dims={ this.dims }
+          res={ this.data_resolution }
         />
         <VerticalSlice
           currentVerticalAxis={ this.props.currentVerticalAxis }
@@ -204,6 +209,7 @@ export default class SlicesContainer extends Component {
           positivify={ this.positivify }
           linearColorScale={ this.linearColorScale }
           dims={ this.dims }
+          res={ this.data_resolution }
         />
       </div>
     );
@@ -327,6 +333,7 @@ export default class SlicesContainer extends Component {
             { 
               this.state.boxes ? 
               <TimelineScrubber
+                timeStamps = { this.state.timeStamps }
                 currentTime={ this.state.currentTime }
                 timeRange={ this.state.timeRange }
                 timeIncrement={ this.state.timeIncrement }

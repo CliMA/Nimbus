@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import React, { useRef, useEffect } from 'react';
 
 function AltVariableScrubber({
-  currentAltVar, handleUpdateInterval, customRange, data }) {
+  timeStamps, currentAltVar, handleUpdateInterval, customRange, data }) {
 
   // --------------------------------------------------------
   // function to scale array so that multiple bars show up for each data point (graphical)
@@ -53,12 +53,13 @@ function AltVariableScrubber({
   // converts indexes to time stamps to hrs and minutes. this function would need to
   // change for other simulations. THIS NEEDS TO CHANGE
   // --------------------------------------------------------
-  const convertToTimestamp = ( start_index, num ) => {
-    var hrs = ('0' + Math.floor((start_index + num) * 2 / 60)).slice(-2);
-    var mins = ('0' + (start_index + num) * 2 % 60).slice(-2);
-    var string = `${hrs}:${mins}:00`
+  const convertToTimestamp = ( index ) => {
+    var str = timeStamps[index];
+    console.log(timeStamps.length);
+    var t = str.indexOf("T");
+    var st = str.slice(t+1,t+9);
 
-    return string;
+    return st;
   }
 
   // --------------------------------------------------------
@@ -87,8 +88,9 @@ function AltVariableScrubber({
       const [x1, x2] = [selection[0],selection[1]];
       const range = [ Math.round(time_x.invert(x1 / scaleAmt)), Math.round(time_x.invert(x2 / scaleAmt))];
       // changes time labels
-      leftTimeStamp = convertToTimestamp(0,range[0]);
-      rightTimeStamp = convertToTimestamp(0,range[1]);
+      console.log(range);
+      leftTimeStamp = convertToTimestamp(range[0]);
+      rightTimeStamp = convertToTimestamp(range[1]-1);
       // updates diagnostic plots
       handleUpdateInterval(range[0], range[1]);
     }

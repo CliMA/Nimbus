@@ -153,7 +153,7 @@ function BoxController({slice_axis, altitude, current_vertical_axis, x_slice_val
   	context.strokeStyle = '#666666';
     context.fillStyle = '#666666';
 
-  	const modelSize = canvasObj.width / 8;
+  	const modelSize = canvasObj.width / 10;
   	const scale = modelSize / 2;
   	const c = 0.2;
   	const fx = oblique.gx(scale, c);
