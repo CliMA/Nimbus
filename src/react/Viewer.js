@@ -100,15 +100,19 @@ export default class Viewer extends Component {
             handleUpdateVerticalX={ this.handleUpdateVerticalX }
             handleUpdateVerticalY={ this.handleUpdateVerticalY }
             handleToggleVerticalAxis={ this.handleToggleVerticalAxis }
-          /> : null
+          /> : 
+          <div className='header-diag-plots-full'>
+            <span>
+              { `${ this.props.selectedDatasets[0]['site_id'] }, ${ this.props.selectedDatasets[0]['sim_id'] } `}
+            </span>
+          </div>
         }
         
-        
         <DiagnosticPlotsContainer
+          hasVolumetricData={ this.props.hasVolumetricData }
           simMetaData={ this.props.simMetaData }
           simDiagnosticData={ this.props.simDiagnosticData }
-          // currentAltitude={ this.state.currentAltitude }
-          currentAltitude={this.props.simMetaData["z_extent"] / 2}
+          currentAltitude={ this.props.hasVolumetricData ? this.props.simMetaData["z_extent"] / 2 : 0 }
         />
       </div>
     );

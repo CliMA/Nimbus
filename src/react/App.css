@@ -91,6 +91,15 @@ label.simulation-id-label {
   background: #5e6171;
 }
 
+.header-diag-plots-full {
+  height: 4.0vh;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 20px;
+  background: #2b2b35;
+  display: flex;
+  color: white;
+}
 
 #data-viewer-container {
   height: 96vh;
@@ -204,6 +213,10 @@ label.simulation-id-label {
 
 #diagnostic-plots-container {
   height: 46vh;
+}
+
+#diagnostic-plots-container.full {
+  height: 96vh;
 }
 
 #slices-container,
