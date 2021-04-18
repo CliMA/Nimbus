@@ -6,7 +6,7 @@ const async          = require('async');
 const app            = express();
 const BSON           = require('bson');
 const PORT           = 8080;
-const userPath       = 'netcdf2nimbus/sample_output';
+const userPath       = 'nimbus_data';
 const SIZE_OF_DOUBLE = 8;
 
 
