@@ -538,7 +538,7 @@ div.tick {
   position: absolute;
   left: 0;
   padding-left: 20px;
-  bottom: 60px;
+  margin-top: 35px;
 }
 
 .plot {
