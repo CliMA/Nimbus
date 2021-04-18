@@ -125,7 +125,7 @@ function VerticalSlice({
 
       svg_x.append("g")
         .attr("transform", `translate(-5,0)`)
-        .call(d3.axisBottom(v_cx).ticks(v_shape.x/(pixelScale * 2)));
+        .call(d3.axisBottom(v_cx).ticks(4));
 
     const svg_y = d3.select(contourY_AxisRef.current)
       .attr('width', 40)
@@ -135,7 +135,7 @@ function VerticalSlice({
 
       svg_y.append("g")
         .attr("transform", `translate(35,5)`)
-        .call(d3.axisLeft(v_cy).ticks(v_shape.y/(pixelScale * 4)));
+        .call(d3.axisLeft(v_cy).ticks(4));
 
   });
 
@@ -176,7 +176,7 @@ function VerticalSlice({
 
       svg.append("g")
         .attr("transform", `translate(0,20)`)
-        .call(d3.axisTop(x).ticks(v_shape.x/(pixelScale*4)));
+        .call(d3.axisTop(x).ticks(5));
 
   });
 

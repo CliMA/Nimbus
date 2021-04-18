@@ -232,7 +232,7 @@ export default class SlicesContainer extends Component {
               min={ this.props.horizontalSliceRange[0] }
               value={ this.props.currentAltitude }
               max={ this.props.horizontalSliceRange[1] }
-              step={ this.props.horizontalIncrement }
+              step={ this.props.horizontalIncrement * this.data_resolution }
             />
             <span>Z</span>
           </div> : null
@@ -287,7 +287,7 @@ export default class SlicesContainer extends Component {
                 this.props.currentVerticalY : this.props.currentVerticalX
               }
               max={ this.props.verticalSliceRange[1] }
-              step={ this.props.verticalIncrement }
+              step={ this.props.verticalIncrement * this.data_resolution }
             />
 
             <div className="axis-label">

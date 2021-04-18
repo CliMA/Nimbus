@@ -181,7 +181,7 @@ function HorizontalSlice({
 
       svg.append("g")
         .attr("transform", `translate(0,20)`)
-        .call(d3.axisTop(x).ticks(h_shape.x/(pixelScale*5)));
+        .call(d3.axisTop(x).ticks(5));
 
   });
 

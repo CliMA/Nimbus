@@ -18,9 +18,6 @@ function get_args()
 		"-o", "--output"
 			help = "directory for output data."
 			required = true
-		"-s", "--site_num"
-			help = "ID number of site."
-			default = "-1"
 		"-n", "--name"
 			help = "simulation identifier."
 			default = "-1"
@@ -52,14 +49,14 @@ function handle_arg_errors(args)
 		exit()
 	end
 
-	if (args["db_add"] || args["add"]) && (args["site_num"] == "-1" || args["name"] == "-1")
+	if (args["db_add"] || args["add"]) && (args["name"] == "-1")
 		println("-----------------------------------------------------------------")
 		println("ERROR: You must provide a valid site number and simulation ID. Exiting...")
 		println("-----------------------------------------------------------------")
 		exit()
 	end
 
-	if args["db_compile"] && (args["site_num"] != "-1" || args["name"] != "-1")
+	if args["db_compile"] && (args["name"] != "-1")
 		println("-----------------------------------------------------------------")
 		println("WARNING: You entered a site number or simulation ID, but are in compile mode; no new data will be added.")
 		println("-----------------------------------------------------------------")
@@ -88,16 +85,9 @@ function handle_arg_errors(args)
 		exit()
 	end
 
-	if !args["db_compile"] && !isdir(args["input"] * "/site" * args["site_num"])
+	if !args["db_compile"] && !isdir(args["input"])
 		println("-----------------------------------------------------------------")
 		println("ERROR: Given input site directory does not exist. Exiting...")
-		println("-----------------------------------------------------------------")
-		exit()
-	end
-
-	if !args["db_compile"] && isdir(args["output"] * "/site" * args["site_num"] * "/" * args["name"])
-		println("-----------------------------------------------------------------")
-		println("ERROR: Given output simulation ID already exists. Exiting...")
 		println("-----------------------------------------------------------------")
 		exit()
 	end
@@ -281,8 +271,8 @@ end
 
 function compile_database(output_folder)
 
-	if isfile("database.json")
-		rm("database.json")
+	if isfile("../nimbusDB.json")
+		rm("../nimbusDB.json")
 	end
 
 	nimbus_data = Dict(
@@ -296,7 +286,8 @@ function compile_database(output_folder)
 	end
 	for site in sites
 		site_data = Dict(
-			"site_num" => site[end-1:end],
+			# "site_num" => site[end-1:end],
+			"site_num" => site[findfirst("site",site)[end]+1:end],
 			"geocoordinates" => get_geo_data(site[end-1:end]),
 			"simulations" => []
 		)
@@ -347,7 +338,7 @@ function main()
 	handle_arg_errors(parsed_args)
 
 	println("-----------------------------------------------------------------")
-	output_folder = parsed_args["output"]
+	output_folder = "../" * parsed_args["output"]
 	if !isdir(output_folder)
 		mkdir(output_folder)
 	end
@@ -360,8 +351,9 @@ function main()
 		#--------------------------------------
 		#FILE SETUP
 		#--------------------------------------
-	    files = sort(readdir(parsed_args["input"] * "/site" * parsed_args["site_num"], join=true))
+		files = sort(readdir(parsed_args["input"], join=true))
 	    files = [file for file in files if occursin(".nc", file)]
+		site_num = parsed_args["input"][findfirst("site",parsed_args["input"])[end]+1:end]
 
 		vol = false
 
@@ -387,7 +379,7 @@ function main()
 
 		println("Converting data. This may take some time...")
 
-		site_folder = output_folder * "/site" * parsed_args["site_num"]
+		site_folder = output_folder * "/site" * site_num
 		if !isdir(site_folder)
 			mkdir(site_folder)
 		end
@@ -455,7 +447,7 @@ function main()
 		#FINAL PRINT
 		println("\twriting meta data...")
 		println("-----------------------------------------------------------------")
-		println("Simulation Site: " * parsed_args["site_num"])
+		println("Simulation Site: " * site_num)
 		println("Simulation ID: " * parsed_args["name"])
 		if vol
 			println("\tvolumetric duration: " * string(meta_data["volumetric_duration"]))
@@ -478,10 +470,10 @@ function main()
 	# PHASE 2. COMPILE DATABASE (FOR MODES --db_add and --db_compile)
 	#--------------------------------------
 	if parsed_args["db_compile"] || parsed_args["db_add"]
-		println("Writing database.json...")
+		println("Writing nimbusDB.json...")
 		database = compile_database(output_folder)
 		nm = JSON.json(database)
-		open("database.json", "w") do x
+		open("../nimbusDB.json", "w") do x
 			write(x, nm)
 		end
 	end
