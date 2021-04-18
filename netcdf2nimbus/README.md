@@ -18,15 +18,15 @@ To install from Julia repl:
 netcdf2nimbus.jl has 3 different modes of operation that are selected by command line tags. The tags are:
 
 - `--add` - convert data to nimbus format
-  - `julia netcdf2nimbus.jl --add -i [input_directory] -o [output_directory] -s [site number] -n [simulation ID]`
+  - `julia netcdf2nimbus.jl --add -i [input_site_directory] -o [output_directory] -n [simulation ID]`
 - `--db_compile` - compile `database.json` with nimbus data from a given output directory
   - `julia netcdf2nimbus.jl --db_compile -o [output_directory]`
 - `--db_add` - convert data to nimbus format and recompile `database.json`
-  - `julia netcdf2nimbus.jl --db_add -i [input_directory] -o [output_directory] -s [site number] -n [simulation ID]`
+  - `julia netcdf2nimbus.jl --db_add -i [input_site_directory] -o [output_directory] -n [simulation ID]`
 
 For example - to add data from a folder `site23` that is in the directory `sample_input` with ID of `01`, and to recompile the database so that it contains that data, run this command:
 
-`julia netcdf2nimbus.jl --db_add -i sample_input -o sample_output -s 23 -n 01`
+`julia netcdf2nimbus.jl --db_add -i sample_input/site23 -o sample_output -n 01`
 
 The input file should be a folder which contains .nc files. The files that `netcdf2nimbus.jl` can handle are as follows:
 
@@ -39,7 +39,7 @@ It currently operates under the assumption that `AtmosLESCore` and `AtmosLESDefa
 
 Additionally if the input folder contains volumetric data, but you do not wish to convert that data, the tag: `--no_vol` can be added anywhere in the command:
 
-`julia netcdf2nimbus.jl --db_add -i sample_input -o sample_output -s 23 -n 01 --no_vol`
+`julia netcdf2nimbus.jl --db_add -i sample_input/site23 -o sample_output -n 01 --no_vol`
 
 The script will create a site folder in `[output_directory]`, and a simulation folder called `[simulation ID]` in the site directory that contains:
 
