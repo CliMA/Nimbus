@@ -4,8 +4,8 @@ node_modules/
 *.bson
 *.json
 !geolocations.nc
+!user-settings.json
 
 .DS_Store
 /build
 /dist
-user-settings.json
