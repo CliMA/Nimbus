@@ -338,7 +338,7 @@ function main()
 	handle_arg_errors(parsed_args)
 
 	println("-----------------------------------------------------------------")
-	output_folder = parsed_args["output"]
+	output_folder = "../" * parsed_args["output"]
 	if !isdir(output_folder)
 		mkdir(output_folder)
 	end

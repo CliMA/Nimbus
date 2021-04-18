@@ -26,7 +26,7 @@ netcdf2nimbus.jl has 3 different modes of operation that are selected by command
 
 For example - to add data from a folder `site23` that is in the directory `sample_input` with ID of `01`, and to recompile the database so that it contains that data, run this command:
 
-`julia netcdf2nimbus.jl --db_add -i sample_input/site23 -o sample_output -n 01`
+`julia netcdf2nimbus.jl --db_add -i sample_input/site23 -o nimbus_data -n 01`
 
 The input file should be a folder which contains .nc files. The files that `netcdf2nimbus.jl` can handle are as follows:
 
@@ -39,7 +39,7 @@ It currently operates under the assumption that `AtmosLESCore` and `AtmosLESDefa
 
 Additionally if the input folder contains volumetric data, but you do not wish to convert that data, the tag: `--no_vol` can be added anywhere in the command:
 
-`julia netcdf2nimbus.jl --db_add -i sample_input/site23 -o sample_output -n 01 --no_vol`
+`julia netcdf2nimbus.jl --db_add -i sample_input/site23 -o nimbus_data -n 01 --no_vol`
 
 The script will create a site folder in `[output_directory]`, and a simulation folder called `[simulation ID]` in the site directory that contains:
 
@@ -47,4 +47,4 @@ The script will create a site folder in `[output_directory]`, and a simulation f
 - _diagnostic.bson
 - volumetric/ (if it exists)
 
-In addition, a file called `database.json` will be created in the `netcdf2nimbus` directory that will keep a current roster of all sites and simulations currently in the given [output_directory]. This roster will be re-created each time `netcdf2nimbus.jl` runs in order to keep it accurate, but it will not update if folders are manually deleted. If you delete a site or simulation folder manually, you will need to re-run `netcdf2nimbus.jl --db_compile -o [output_directory]` in order to remove that site or simulation from `database.json`.
+In addition, a file called `database.json` will be created in the `netcdf2nimbus` directory that will keep a current roster of all sites and simulations currently in the given [output_directory]. This roster will be re-created each time `netcdf2nimbus.jl` runs in order to keep it accurate, but it will not update if folders are manually deleted. If you delete a site or simulation folder manually, you will need to re-run `netcdf2nimbus.jl --db_compile -o [output_directory]` in order to remove that site or simulation from `nimbusDB.json`.
