@@ -155,7 +155,8 @@ function BSON_parse(ds) {
           let small_array = [];
           let bufferlength = dims[0] * SIZE_OF_DOUBLE;
           for(let j=0; j<bufferlength; j+=SIZE_OF_DOUBLE) {
-            let offset = (m * bufferlength) + (n*bufferlength) + j;
+            let offset = (m*dims[1]*bufferlength) + (n*bufferlength) + j;
+            
             // let offset = (m*n*bufferlength) + (n*bufferlength) + j;
             let d = buffer.readDoubleLE(offset);
             small_array.push(d);
