@@ -61,7 +61,7 @@ export default class SlicesContainer extends Component {
       params: {
         sim: this.props.selectedDatasets[0],
         samplingRes: this.data_resolution,
-        tsRange: 2,
+        tsRange: this.props.simMetaData["volumetric_time_stamps"].length,
         tsStarting: 1  
       }
     }).then(res => {

@@ -39,12 +39,11 @@ app.get('/volDataForTSRange', async (req, res) => {
 
   // make sure to wait for all timestamps?
   for (let i = tsStarting; i <= tsRange; i++) {
-    let tsDir = `${ volDir }/t_${ i }/`
+    let id = i.pad(4)
+    let tsDir = `${ volDir }/t_${ id }/`
     const a = await getVolDataForTS(tsDir, i)
     tsRangeData.push(a);
   }
-
-  // console.log('tsRangeData: ', tsRangeData);
 
   res.send(tsRangeData);
 })
@@ -187,4 +186,9 @@ function BSON_parse(ds) {
     dict[variable_names[i]] = big_array;
   }
   return dict;
+}
+
+Number.prototype.pad = function(size) {
+  var sign = Math.sign(this) === -1 ? '-' : '';
+  return sign + new Array(size).concat([Math.abs(this)]).join('0').slice(-size);
 }
