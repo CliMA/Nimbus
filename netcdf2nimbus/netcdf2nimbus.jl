@@ -431,11 +431,11 @@ function main()
 			for v in volumetric_data
 				t_counter = 1
 				for time_stamp in v
-					folder_name = vfs[counter] * "/t_" * string(t_counter)
+					folder_name = vfs[counter] * "/t_" * lpad(t_counter,4,"0")
 					mkdir(folder_name)
 					a_counter = 1
 					for altitude in time_stamp
-						bson(folder_name * "/set_" * string(a_counter) * ".bson", altitude)
+						bson(folder_name * "/set_" * lpad(a_counter,3,"0") * ".bson", altitude)
 						a_counter+=1
 					end
 					t_counter+=1
