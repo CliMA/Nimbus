@@ -259,9 +259,9 @@ function get_meta_data(vol, parsed_args, core, default, aux=nothing, state=nothi
     return meta_data
 end
 
-function get_geo_data(site_num)
+function get_geo_data(site_num, nimbus_dir)
 	site = parse(Int64, site_num)
-	geo = Dataset("geolocation.nc")
+	geo = Dataset(nimbus_dir * "/netcdf2nimbus" * "/geolocation.nc")
 	site_data = Dict(
 		"lat" =>  geo["lat"][site],
 		"lon" => geo["lon"][site]
@@ -269,10 +269,10 @@ function get_geo_data(site_num)
 	return site_data
 end
 
-function compile_database(output_folder)
+function compile_database(output_folder, nimbus_dir)
 
-	if isfile("../nimbusDB.json")
-		rm("../nimbusDB.json")
+	if isfile(nimbus_dir * "/nimbusDB.json")
+		rm(nimbus_dir * "/nimbusDB.json")
 	end
 
 	nimbus_data = Dict(
@@ -288,7 +288,7 @@ function compile_database(output_folder)
 		site_data = Dict(
 			# "site_num" => site[end-1:end],
 			"site_num" => site[findfirst("site",site)[end]+1:end],
-			"geocoordinates" => get_geo_data(site[end-1:end]),
+			"geocoordinates" => get_geo_data(site[end-1:end], nimbus_dir),
 			"simulations" => []
 		)
 		sims = sort(readdir(output_folder * "/" * site))
@@ -338,7 +338,11 @@ function main()
 	handle_arg_errors(parsed_args)
 
 	println("-----------------------------------------------------------------")
-	output_folder = "../" * parsed_args["output"]
+	nimbus_dir = dirname(Base.source_dir())
+	curr_dir = pwd()
+	
+	output_folder = curr_dir * "/" * parsed_args["output"]
+	
 	if !isdir(output_folder)
 		mkdir(output_folder)
 	end
@@ -471,9 +475,9 @@ function main()
 	#--------------------------------------
 	if parsed_args["db_compile"] || parsed_args["db_add"]
 		println("Writing nimbusDB.json...")
-		database = compile_database(output_folder)
+		database = compile_database(output_folder, nimbus_dir)
 		nm = JSON.json(database)
-		open("../nimbusDB.json", "w") do x
+		open(nimbus_dir * "/nimbusDB.json", "w") do x
 			write(x, nm)
 		end
 	end

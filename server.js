@@ -6,7 +6,7 @@ const async          = require('async');
 const app            = express();
 const BSON           = require('bson');
 const PORT           = 8080;
-const userPath       = 'nimbus_data';
+const userPath       = "nimbus_data";
 const SIZE_OF_DOUBLE = 8;
 
 
@@ -84,6 +84,7 @@ async function getVolDataForTS(tsDir, idx) {
 // --------------------------------------------------------
 app.get('/simDiagnosticFile', (req, res) => {
   let sim = JSON.parse(req.query.sim);
+
   let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.bson`;
 
   fs.readFile(diagPath, (err, data) => {
@@ -100,6 +101,7 @@ app.get('/simDiagnosticFile', (req, res) => {
 // --------------------------------------------------------
 app.get('/simMetaFile', (req, res) => {
   let sim = JSON.parse(req.query.sim);
+
   let metaPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_meta.json`;
 
   fs.readFile(metaPath, (err, data) => {
