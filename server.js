@@ -7,12 +7,13 @@ const app            = express();
 const BSON           = require('bson');
 const PORT           = 8080;
 const userPath       = "nimbus_data";
+const dbPath         = "./nimbusDB.json";
 const SIZE_OF_DOUBLE = 8;
 
 
 // --------------------------------------------------------
 app.get('/dbMetadataList', (req, res) => {
-  fs.readFile('./nimbusDB.json', (err, data) => {
+  fs.readFile(dbPath, (err, data) => {
     if (err) {
       throw err;
     }
