@@ -21,6 +21,9 @@ function get_args()
 		"-n", "--name"
 			help = "simulation identifier."
 			default = "-1"
+		"-d", "--dbName"
+			help = "file name for database file."
+			default = "nimbusDB.json"
 		"--db_add"
 			help = "flag to convert simulation data and recompile database."
 			action = :store_true
@@ -269,10 +272,10 @@ function get_geo_data(site_num, nimbus_dir)
 	return site_data
 end
 
-function compile_database(output_folder, nimbus_dir)
+function compile_database(output_folder, nimbus_dir, dbName)
 
-	if isfile(nimbus_dir * "/nimbusDB.json")
-		rm(nimbus_dir * "/nimbusDB.json")
+	if isfile(nimbus_dir * "/" * dbName)
+		rm(nimbus_dir * "/" * dbName)
 	end
 
 	nimbus_data = Dict(
@@ -336,6 +339,11 @@ function main()
 
 	parsed_args = get_args()
 	handle_arg_errors(parsed_args)
+
+	dbName = parsed_args["dbName"];
+	if !occursin(".json", dbName)
+		dbName = dbName * ".json"
+	end
 
 	println("-----------------------------------------------------------------")
 	nimbus_dir = dirname(Base.source_dir())
@@ -474,10 +482,10 @@ function main()
 	# PHASE 2. COMPILE DATABASE (FOR MODES --db_add and --db_compile)
 	#--------------------------------------
 	if parsed_args["db_compile"] || parsed_args["db_add"]
-		println("Writing nimbusDB.json...")
-		database = compile_database(output_folder, nimbus_dir)
+		println("Writing " * dbName * "...")
+		database = compile_database(output_folder, nimbus_dir, dbName)
 		nm = JSON.json(database)
-		open(nimbus_dir * "/nimbusDB.json", "w") do x
+		open(nimbus_dir * "/" * dbName, "w") do x
 			write(x, nm)
 		end
 	end
