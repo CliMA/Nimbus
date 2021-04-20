@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactGlobe from 'react-globe';
 
 function WorldMap({ dbMetadataList }) {
 
-  console.log('[ WorldMap ] dbMetadataList', dbMetadataList);
   const options = {};
 
   let geoMarkers = dbMetadataList && dbMetadataList['sites'].map((site, idx) => {
@@ -17,8 +16,6 @@ function WorldMap({ dbMetadataList }) {
       coordinates: [site.geocoordinates.lat, site.geocoordinates.lon]
     }
   });
-
-  console.log(geoMarkers);
 
   return (
     <ReactGlobe

@@ -41,13 +41,14 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   constructor(props) {
+  
     super(props);
+    console.log('simmeta: ', this.props.simMetaData)
 
     this.state = {
-      timeStamps: this.props.simMetaData["volumetric_time_stamps"],
-      currentTime: 0,
-      timeRange: [0, this.props.simMetaData["volumetric_time_stamps"].length - 1], // number of files loaded in
-      timeIncrement: 1, // increment for time scrubber
+      currentTime   : 0, // current time for time scrubber
+      tsBatchSize   : this.props.simMetaData["volumetric_num_time_stamps"] > 10 ? 10 : this.props.simMetaData["volumetric_num_time_stamps"],
+      timeIncrement : 1, // increment for time scrubber
     };
 
     this.positivify       = this.positivify.bind(this);
@@ -57,21 +58,39 @@ export default class SlicesContainer extends Component {
   // --------------------------------------------------------
   componentDidMount() {
 
-    axios.get('/volDataForTSRange', {
+    // Default call for timestamp data starting at first timestamp
+    this.getDataForTimestamps(0);
+  }
+
+  // --------------------------------------------------------
+  // Retrieves data for timestamps starting at ts until 
+  // ts + tsBatchSize - 1, e.g., starting at 4 with batch size of 5 
+  // should be data for [4, 5, 6, 7, 8]
+  getDataForTimestamps(ts) {
+    console.log(ts);
+    this.setState({
+      boxes: null
+    });
+
+    return axios.get('/volDataForTSBatchSize', {
       params: {
         sim: this.props.selectedDatasets[0],
         samplingRes: this.data_resolution,
-        tsRange: 2,
-        tsStarting: 1  
+        tsBatchSize: this.state.tsBatchSize,
+        tsStarting: ts
       }
     }).then(res => {
-      // this.boxes = this.compile_vol_data(res);
-      // console.log(this.boxes);
-      this.setState({
-        boxes: this.compile_vol_data(res)
-      });
+      this.setState(
+        {
+          currentRange: [ ts, ts + this.state.tsBatchSize - 1],
+          boxes: this.compile_vol_data(res)
+        },
+        () => {
+          console.log('done setting boxes')
+        }
+      )
     }).catch(e => {
-      console.log('/volDataForTSRange error: ', e);
+      console.log('/volDataForTSBatchSize error: ', e);
     });
   }
 
@@ -109,7 +128,47 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   handleUpdateTime = (e) => {
-    this.setState({ currentTime: parseInt(e.target.value) });
+
+    let parsedSelectedTime = parseInt(e.target.value);
+    console.log('parsedSelectedTime: ', parsedSelectedTime);
+  
+    this.setState({
+      currentTime: parsedSelectedTime
+    });
+
+    // if we loaded all data (less than 10 timestamps)
+
+    if (this.state.tsBatchSize === this.props.simMetaData["volumetric_num_time_stamps"]) {
+      this.setState({ currentTime: parsedSelectedTime });
+    } else {
+      // if we are out of range, make a call for new data
+      if (
+        (parsedSelectedTime) < this.state.currentRange[0]  ||
+        (parsedSelectedTime) > this.state.currentRange[1]
+      ) {
+
+        console.log('out of range: ', parsedSelectedTime);
+        
+        // If we're not at the beginning 5 time steps
+        if (parsedSelectedTime >= 5) {
+          console.log('here');
+          this.getDataForTimestamps(parsedSelectedTime - 2)
+            .then(() => {
+              this.setState({ currentTime: parsedSelectedTime });
+            })
+        } else {
+          this.getDataForTimestamps(0)
+            .then(() => {
+              this.setState({ currentTime: parsedSelectedTime });
+            });
+        }
+        
+      } else {
+        // we're not out of range, just update the time
+        this.setState({ currentTime: parsedSelectedTime });
+      }
+    }
+
   };
 
   // --------------------------------------------------------
@@ -143,7 +202,6 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   renderCurrentSliceView() {
-    console.log('[ renderCurrentSliceView ] boxes: ', this.state.boxes);
     if (this.props.currentSliceType === 'HORIZONTAL') {
       return (
         <div className='slice-container-inner'>
@@ -305,7 +363,8 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   render() {
-    //console.log(this.props);
+    console.log('currentRange: ', this.state.currentRange);
+    console.log('currentTime: '+ this.state.currentTime);
     return (
       <div id='slices-container'>
         {/* COLUMNS */}
@@ -333,9 +392,9 @@ export default class SlicesContainer extends Component {
             { 
               this.state.boxes ? 
               <TimelineScrubber
-                timeStamps = { this.state.timeStamps }
+                timeStamps = { this.props.simMetaData["volumetric_time_stamps"] }
                 currentTime={ this.state.currentTime }
-                timeRange={ this.state.timeRange }
+                timeRange={ [0, this.props.simMetaData["volumetric_time_stamps"].length - 1] }
                 timeIncrement={ this.state.timeIncrement }
                 handleUpdateTime={ this.handleUpdateTime }
               /> : 

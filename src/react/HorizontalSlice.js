@@ -21,7 +21,7 @@ function HorizontalSlice({
 
   const pixelScale = window.innerHeight * 1/h_shape.x * .3;
 
-  console.log(h_shape);
+  // console.log(h_shape);
 
   // --------------------------------------------------------
   // retrieves the arrays for the slices from the 3D data - 'full array' variables are

@@ -28,7 +28,7 @@ function TimelineScrubber({
   // --------------------------------------------------------
   const convertToTimestamp = ( index ) => {
     var str = timeStamps[index];
-    console.log(timeStamps);
+    // console.log(timeStamps);
     var t = str.indexOf("T");
     var st = str.slice(t+1,t+9);
 

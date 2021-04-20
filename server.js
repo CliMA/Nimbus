@@ -27,26 +27,25 @@ app.get('/dbMetadataList', (req, res) => {
 */
 // --------------------------------------------------------
 // Return volumetric data for range of timestamps
-app.get('/volDataForTSRange', async (req, res) => {
+app.get('/volDataForTSBatchSize', async (req, res) => {
   let sim         = JSON.parse(req.query.sim);
   let samplingRes = JSON.parse(req.query.samplingRes);
-  let tsRange     = JSON.parse(req.query.tsRange);
-  let tsStarting  = JSON.parse(req.query.tsStarting);
+  let tsBatchSize = JSON.parse(req.query.tsBatchSize);
+  let tsStarting  = JSON.parse(req.query.tsStarting) + 1;
 
   let volDir = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/volumetric/${ samplingRes }x`;
 
-  let tsRangeData = [];
+  let tsBatchData = [];
 
   // make sure to wait for all timestamps?
-  for (let i = tsStarting; i <= tsRange; i++) {
+  console.log('tsStarting: ',tsStarting);
+  console.log('ending: ', tsStarting + tsBatchSize - 1)
+  for (let i = tsStarting; i <= (tsStarting + tsBatchSize - 1); i++) {
     let tsDir = `${ volDir }/t_${ i }/`
     const a = await getVolDataForTS(tsDir, i)
-    tsRangeData.push(a);
+    tsBatchData.push(a);
   }
-
-  // console.log('tsRangeData: ', tsRangeData);
-
-  res.send(tsRangeData);
+  res.send(tsBatchData);
 })
 
 
