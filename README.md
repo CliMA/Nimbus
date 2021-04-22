@@ -57,7 +57,7 @@ To create a production build for the web, run `npm run build` in terminal. This 
 
 
 ## PRODUCTION - Electron
-See `package.json` scripts section and script notes to create a production Electron app. 
+See `package.json` scripts section and script notes to create a production Electron app. In particular, see the `package` script which will generate executables for both Mac and Windows inside of the `./dist` directory See notes that we followed [here](https://medium.com/@johndyer24/building-a-production-electron-create-react-app-application-with-shared-code-using-electron-builder-c1f70f0e2649). 
 
 
 ## Notes

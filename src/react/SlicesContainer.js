@@ -47,7 +47,7 @@ export default class SlicesContainer extends Component {
 
     this.state = {
       currentTime   : 0, // current time for time scrubber
-      tsBatchSize   : this.props.simMetaData["volumetric_num_time_stamps"] > 10 ? 10 : this.props.simMetaData["volumetric_num_time_stamps"],
+      tsBatchSize   : this.props.simMetaData["volumetric_num_time_stamps"] > 10 ? 5 : this.props.simMetaData["volumetric_num_time_stamps"],
       timeIncrement : 1, // increment for time scrubber
     };
 
@@ -75,6 +75,7 @@ export default class SlicesContainer extends Component {
     return axios.get('/volDataForTSBatchSize', {
       params: {
         sim: this.props.selectedDatasets[0],
+        tsNum: this.props.simMetaData["volumetric_num_time_stamps"],
         samplingRes: this.data_resolution,
         tsBatchSize: this.state.tsBatchSize,
         tsStarting: ts
@@ -206,6 +207,7 @@ export default class SlicesContainer extends Component {
       return (
         <div className='slice-container-inner'>
           <HorizontalSlice
+            offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
             current_time={ this.state.currentTime }
             altitude={ this.props.currentAltitude }
             contour_var={ this.var_opts[0] }
@@ -217,6 +219,7 @@ export default class SlicesContainer extends Component {
           />
 
           <HorizontalSlice
+            offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
             current_time={ this.state.currentTime }
             altitude={ this.props.currentAltitude }
             contour_var={ this.var_opts[0] }
@@ -228,6 +231,7 @@ export default class SlicesContainer extends Component {
           />
 
           <HorizontalSlice
+            offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
             current_time={ this.state.currentTime }
             altitude={ this.props.currentAltitude }
             contour_var={ this.var_opts[0] }
@@ -392,6 +396,7 @@ export default class SlicesContainer extends Component {
             { 
               this.state.boxes ? 
               <TimelineScrubber
+                currentRange={ this.state.currentRange }
                 timeStamps = { this.props.simMetaData["volumetric_time_stamps"] }
                 currentTime={ this.state.currentTime }
                 timeRange={ [0, this.props.simMetaData["volumetric_time_stamps"].length - 1] }

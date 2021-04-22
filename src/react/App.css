@@ -595,15 +595,21 @@ span.time-scrubber-label {
   justify-content: space-between;
 }
 
+
 div.tick {
   display: flex;
   justify-content: center;
   text-align: center;
-  width: 1px;
+  width: 2px;
   background: #D3D3D3;
   height: 10px;
 }
 
+div.tick.data-loaded {
+  background: #b6c7fe;
+  height: 20px; 
+  z-index: 998;
+}
 
 /* DIAGNOSTIC PLOTS + TKE */
 #diagnostic-plots-container {

@@ -26,15 +26,26 @@ app.get('/volDataForTSBatchSize', async (req, res) => {
   let samplingRes = JSON.parse(req.query.samplingRes);
   let tsBatchSize = JSON.parse(req.query.tsBatchSize);
   let tsStarting  = JSON.parse(req.query.tsStarting) + 1;
+  let tsNum       = JSON.parse(req.query.tsNum);
 
   let volDir = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/volumetric/${ samplingRes }x`;
 
   let tsBatchData = [];
 
   // Make sure to wait for all data
+  console.log('---------')
   console.log('tsStarting: ',tsStarting);
   console.log('ending: ', tsStarting + tsBatchSize - 1)
-  for (let i = tsStarting; i <= (tsStarting + tsBatchSize - 1); i++) {
+  console.log('tsNum', tsNum);
+
+  let tsMax;
+  if (tsNum - tsStarting < 5) {
+    tsMax = tsNum - tsStarting;
+  } else {
+    tsMax = tsStarting + tsBatchSize - 1
+  }
+
+  for (let i = tsStarting; i <= tsMax; i++) {
     let tsDir = `${ volDir }/t_${ i }/`
     const a = await getVolDataForTS(tsDir, i)
     tsBatchData.push(a);
