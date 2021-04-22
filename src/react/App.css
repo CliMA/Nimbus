@@ -88,7 +88,7 @@ label.simulation-id-label {
   align-items: center;
   justify-content: space-between;
   padding: 0px 20px;
-  background: #5e6171;
+  background: #545766;
 }
 
 .header-diag-plots-full {
@@ -143,21 +143,106 @@ label.simulation-id-label {
   background: #16171d;
 }
 
-#user-settings-modal {
-  position: absolute;
-	z-index: 999;
-	width: 60vw;
-	height: 40vh;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%,-50%);
-	background: #d6d6d6;
-  border-radius: 5px;
+
+#user-settings-darken {
   display: none;
 }
 
-#user-settings-modal.visible {
+#user-db-container {
+  flex-grow: 1;
+  background: #545766;
+  padding: 40px;
+  border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+#user-db-container > span {
+  font-size: 14px;
+}
+
+#user-db-path-container {
+	margin: 16px 0px;
+	padding: 12px;
+	border: 1px solid #22242c;
+	background: #313441;
+	border-radius: 4px;
+	border-width: 1px;
+  font-size: 14px;
+  color: #969696;
+}
+
+#user-db-update-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+input[type="file"] { 
+  z-index: -1;
+  position: absolute;
+  opacity: 0;
+}
+
+label#select-db {
+	padding: 8px 12px;
+	font-size: 12px;
+	margin-top: 8px;
+	border-radius: 16px;
+	background: #323441;
+}
+
+label#select-db:hover {
+  cursor: pointer;
+}
+
+#user-settings-darken.visible {
+  width: 100vw;
+	height: 100vh;
+	position: fixed;
   display: block;
+	z-index: 999;
+	background: #0c0d13bd;
+}
+
+#user-settings-modal {
+  position: absolute;
+	z-index: 999;
+	min-width: 45vw;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+  border-radius: 8px;
+  display: none;
+}
+
+#user-settings-header {
+  height: 40px;
+	background: var(--header-section-blue);
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+	display: flex;
+	align-items: center;
+	padding: 0px 12px;
+  justify-content: space-between;
+}
+
+div#icon-settings-close-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+div#icon-settings-close-container:hover {
+  cursor: pointer;
+}
+
+#icon-settings-close {
+  width: 20px;
+  height: 20px;
+}
+
+#user-settings-modal.visible {
+  display: flex;
+  flex-direction: column;
 }
 
 

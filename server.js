@@ -2,7 +2,6 @@ const express        = require('express');
 const path           = require('path');
 const fs             = require('fs');
 const fse            = require('fs-extra');
-const async          = require('async');
 const app            = express();
 const BSON           = require('bson');
 const PORT           = 8080;
@@ -21,11 +20,6 @@ app.get('/dbMetadataList', (req, res) => {
 });
 
 // --------------------------------------------------------
-/* At time of writing, we were given simulation data with 
-  only two volumetric files. This call needs to be updated
-  later to handle multiple / larger batch calls as desired.
-*/
-// --------------------------------------------------------
 // Return volumetric data for range of timestamps
 app.get('/volDataForTSBatchSize', async (req, res) => {
   let sim         = JSON.parse(req.query.sim);
@@ -37,7 +31,7 @@ app.get('/volDataForTSBatchSize', async (req, res) => {
 
   let tsBatchData = [];
 
-  // make sure to wait for all timestamps?
+  // Make sure to wait for all data
   console.log('tsStarting: ',tsStarting);
   console.log('ending: ', tsStarting + tsBatchSize - 1)
   for (let i = tsStarting; i <= (tsStarting + tsBatchSize - 1); i++) {
@@ -77,7 +71,7 @@ async function getVolDataForTS(tsDir, idx) {
       //   console.log("The file was saved!");
       // }); 
 
-      return allcontent
+      return allcontent;
     });
 }
 
