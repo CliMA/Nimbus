@@ -43,21 +43,21 @@ Similarly, these child components also import other components - for example, `S
 The data visualizations are created with d3, and use both SVG and Canvas for rendering.
 
 
-## DEVELOPMENT
+## DEVELOPMENT - Web
 In a terminal window, run `node server.js` to start the server (running on port  `8080`).
 In another terminal winow, run `npm run start` and open a browser to `localhost:3000`. 
 
-The `start` script is run from the react-scripts module as part of create-react-app see [here](https://create-react-app.dev/docs/available-scripts/), which uses its own webpack config. We have not changed that. To make a custom config, you must first eject (see aforementioned link to available scripts above).
+The `start` script is run from the react-scripts module as part of `create-react-app` see [here](https://create-react-app.dev/docs/available-scripts/), which uses its own webpack config. We have not changed that. To make a custom config, you must first eject (see aforementioned link to available scripts above). Additionally, the `create-react-app` has a `/public` folder. In development, `src/index.js` is looking for the `index.html` inside `/public`, as it appends everything within `<div id="root"></div>`.  
 
 Calls to the node server running on 8080 are done via proxy so that calls can be made from port 3000 - this is set up in `package.json`. 
 
 
 ## PRODUCTION - Web
-To create a production build for the web, run `npm run build` in terminal. This will create the bundled react js files in build > static > js. Once that is complete, you should be able to run the server again with `node server.js`, which serves the build directory. You should be able to open a browser tab to `localhost:8080`.
+To create a production build for the web, run `npm run build` in terminal. This will create the bundled js files in `/build > /static > /js`. The `index.html` from the `/public` is copied to the `build` folder that is generated. Once that is complete, you should be able to run the server again with `node server.js`, which will then serve the build directory. You should be able to open a browser tab to `localhost:8080`.
 
 
 ## PRODUCTION - Electron
-
+See `package.json` scripts section and script notes to create a production Electron app. 
 
 
 ## Notes
