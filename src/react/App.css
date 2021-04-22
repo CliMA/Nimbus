@@ -582,8 +582,8 @@ span.time-scrubber-label {
   margin-top: 0.8px;
   width: 8px;
   height: 3vh;
-  background: #b6c8ff;
-  border-radius: 2px;
+  background: #00b6ff;
+  border-radius: 4px;
 }
 
 .sliderticks {
@@ -600,13 +600,14 @@ div.tick {
   display: flex;
   justify-content: center;
   text-align: center;
-  width: 2px;
+  width: 4px;
+  border-radius: 4px;
   background: #D3D3D3;
   height: 10px;
 }
 
 div.tick.data-loaded {
-  background: #b6c7fe;
+  background: #00b6ff;
   height: 20px; 
   z-index: 998;
 }
