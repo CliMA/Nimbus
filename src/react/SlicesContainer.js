@@ -81,6 +81,7 @@ export default class SlicesContainer extends Component {
         tsStarting: ts
       }
     }).then(res => {
+      console.log(res);
       this.setState(
         {
           currentRange: [ ts, ts + this.state.tsBatchSize - 1],
@@ -129,8 +130,10 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   handleUpdateTime = (e) => {
-
+    console.log('[ handleUpdateTime ] called')
     let parsedSelectedTime = parseInt(e.target.value);
+    let numVolTS = this.props.simMetaData["volumetric_num_time_stamps"];
+
     console.log('parsedSelectedTime: ', parsedSelectedTime);
   
     this.setState({
@@ -139,7 +142,7 @@ export default class SlicesContainer extends Component {
 
     // if we loaded all data (less than 10 timestamps)
 
-    if (this.state.tsBatchSize === this.props.simMetaData["volumetric_num_time_stamps"]) {
+    if (this.state.tsBatchSize === numVolTS) {
       this.setState({ currentTime: parsedSelectedTime });
     } else {
       // if we are out of range, make a call for new data
@@ -157,9 +160,9 @@ export default class SlicesContainer extends Component {
               this.setState({ currentTime: parsedSelectedTime });
             });
         // if we're within 3 of the last time stamp
-        } else if (parsedSelectedTime > this.props.simMetaData["volumetric_num_time_stamps"] - this.state.tsBatchSize/2 - 1) {
+        } else if (parsedSelectedTime > numVolTS - this.state.tsBatchSize/2 - 1) {
           console.log('nearing the end');
-          this.getDataForTimestamps(this.props.simMetaData["volumetric_num_time_stamps"] - this.state.tsBatchSize - 1)
+          this.getDataForTimestamps(numVolTS - this.state.tsBatchSize - 1)
             .then(() => {
               this.setState({ currentTime: parsedSelectedTime });
             })

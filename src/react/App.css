@@ -561,11 +561,11 @@ span.time-scrubber-label {
 
 #time-scrubber-ctrl {
   z-index: 998;
-  top: 50%;
-  transform: translateY(-50%);
-  width: calc(100% - 12px);
+  top: 35%;
+  /* transform: translateY(-50%); */
+  width: calc(100%);
   position: absolute;
-  height: 1.5px;
+  height: 1px;
   background: #d3d3d3;
   outline: none;
   -webkit-appearance: none;
@@ -579,19 +579,20 @@ span.time-scrubber-label {
 #time-scrubber-ctrl::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  margin-top: 0.8px;
   width: 8px;
-  height: 3vh;
+  /* height: 3vh; */
+  height: 20px;
   background: #00b6ff;
   border-radius: 4px;
 }
 
 .sliderticks {
   position: absolute;
-  width: calc(100% - 12px);
+  width: calc(99.9999%); /* hack for tiny pixel */
   display: flex;
   height: 100%;
-  align-items: center;
+  /* align-items: center; */
+  top: 25%;
   justify-content: space-between;
 }
 
@@ -600,15 +601,20 @@ div.tick {
   display: flex;
   justify-content: center;
   text-align: center;
-  width: 4px;
-  border-radius: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   background: #D3D3D3;
-  height: 10px;
+}
+
+.tick > div, .tick.data-loaded > div {
+	margin-top: 18px;
+  font-size: 0.5em;
+	z-index: 9999999!important;
 }
 
 div.tick.data-loaded {
   background: #00b6ff;
-  height: 20px; 
   z-index: 998;
 }
 

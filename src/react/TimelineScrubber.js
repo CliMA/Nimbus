@@ -25,7 +25,7 @@ function TimelineScrubber({
             id={`tick-${i}`} 
             className={`tick ${ i >= currentRange[0] && i <= currentRange[1] ? 'data-loaded' : ''}`} 
             key={`tick-${i}`}
-          ></div>
+          ><div>{`${i + 1}`}</div></div>
         )}
       </div>
     );

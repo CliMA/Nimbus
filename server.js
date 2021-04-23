@@ -34,11 +34,6 @@ app.get('/volDataForTSBatchSize', async (req, res) => {
   let tsBatchData = [];
 
   // Make sure to wait for all data
-  console.log('---------')
-  console.log('tsStarting: ',tsStarting);
-  console.log('ending: ', tsStarting + tsBatchSize - 1)
-  console.log('tsNum', tsNum);
-
   let tsMax;
   if (tsNum - tsStarting < 5) {
     tsMax = tsNum - tsStarting;
@@ -46,10 +41,17 @@ app.get('/volDataForTSBatchSize', async (req, res) => {
     tsMax = tsStarting + tsBatchSize - 1
   }
 
+  console.log('---------')
+  console.log('tsNum', tsNum);
+  console.log('tsStarting: ',tsStarting);
+  console.log('tsBatchSize: ', tsBatchSize);
+  console.log('tsMax: ', tsMax);
+
   // make sure to wait for all timestamps?
-  for (let i = tsStarting; i <= tsMax; i++) {
+  for (let i = tsStarting; i <= tsMax + 1; i++) {
     let id = i.pad(4)
     let tsDir = `${ volDir }/t_${ id }/`
+    console.log('tsDir: ', tsDir);
     const a = await getVolDataForTS(tsDir, i)
     tsBatchData.push(a);
   }
