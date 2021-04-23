@@ -150,18 +150,25 @@ export default class SlicesContainer extends Component {
 
         console.log('out of range: ', parsedSelectedTime);
         
-        // If we're not at the beginning 5 time steps
-        if (parsedSelectedTime >= 5) {
-          console.log('here');
-          this.getDataForTimestamps(parsedSelectedTime - 2)
-            .then(() => {
-              this.setState({ currentTime: parsedSelectedTime });
-            })
-        } else {
+        // If we're in the first 5 time stamps
+        if (parsedSelectedTime < 5) {
           this.getDataForTimestamps(0)
             .then(() => {
               this.setState({ currentTime: parsedSelectedTime });
             });
+        // if we're within 3 of the last time stamp
+        } else if (parsedSelectedTime > this.props.simMetaData["volumetric_num_time_stamps"] - this.state.tsBatchSize/2 - 1) {
+          console.log('nearing the end');
+          this.getDataForTimestamps(this.props.simMetaData["volumetric_num_time_stamps"] - this.state.tsBatchSize - 1)
+            .then(() => {
+              this.setState({ currentTime: parsedSelectedTime });
+            })
+        // if we're somewhere in the middle
+        } else {
+          this.getDataForTimestamps(parsedSelectedTime - 2)
+            .then(() => {
+              this.setState({ currentTime: parsedSelectedTime });
+            })
         }
         
       } else {
@@ -252,6 +259,7 @@ export default class SlicesContainer extends Component {
           currentVerticalX={ this.props.currentVerticalX }
           currentVerticalY={ this.props.currentVerticalY }
           current_time={ this.state.currentTime }
+          offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
           contour_var={ this.var_opts[0] }
           contour_var_opts={ this.var_opts }
           boxes_span={ this.state.boxes }
@@ -265,6 +273,7 @@ export default class SlicesContainer extends Component {
           currentVerticalX={ this.props.currentVerticalX }
           currentVerticalY={ this.props.currentVerticalY }
           current_time={ this.state.currentTime }
+          offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
           contour_var={ this.var_opts[0] }
           contour_var_opts={ this.var_opts }
           boxes_span={ this.state.boxes }

@@ -4,7 +4,7 @@ import Dropdown from './Dropdown';
 
 function VerticalSlice({
   currentVerticalAxis, currentVerticalX, currentVerticalY,
-	current_time, contour_var, contour_var_opts,
+	current_time, offset, contour_var, contour_var_opts,
 	boxes_span, positivify, linearColorScale, dims, res }) {
 
   // --------------------------------------------------------
@@ -31,9 +31,9 @@ function VerticalSlice({
   // --------------------------------------------------------
   const display_array = () => {
     if (currentVerticalAxis === 'Y') {
-      return d3.zip(...boxes_span[displayedContour][current_time].map(d => d3.zip(...d)))[parseInt(currentVerticalY/sample_rate)].reverse();
+      return d3.zip(...boxes_span[displayedContour][current_time - offset].map(d => d3.zip(...d)))[parseInt(currentVerticalY/sample_rate)].reverse();
     } else {
-      return d3.zip(...boxes_span[displayedContour][current_time])[parseInt(currentVerticalX/sample_rate)].reverse();
+      return d3.zip(...boxes_span[displayedContour][current_time - offset])[parseInt(currentVerticalX/sample_rate)].reverse();
     }
   }
 
