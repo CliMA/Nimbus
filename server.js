@@ -5,13 +5,14 @@ const fse            = require('fs-extra');
 const app            = express();
 const BSON           = require('bson');
 const PORT           = 8080;
-const userPath       = 'nimbus_data';
+const userPath       = "nimbus_data";
+const dbPath         = "./nimbusDB.json";
 const SIZE_OF_DOUBLE = 8;
 
 
 // --------------------------------------------------------
 app.get('/dbMetadataList', (req, res) => {
-  fs.readFile('./nimbusDB.json', (err, data) => {
+  fs.readFile(dbPath, (err, data) => {
     if (err) {
       throw err;
     }
@@ -45,8 +46,10 @@ app.get('/volDataForTSBatchSize', async (req, res) => {
     tsMax = tsStarting + tsBatchSize - 1
   }
 
+  // make sure to wait for all timestamps?
   for (let i = tsStarting; i <= tsMax; i++) {
-    let tsDir = `${ volDir }/t_${ i }/`
+    let id = i.pad(4)
+    let tsDir = `${ volDir }/t_${ id }/`
     const a = await getVolDataForTS(tsDir, i)
     tsBatchData.push(a);
   }
@@ -89,6 +92,7 @@ async function getVolDataForTS(tsDir, idx) {
 // --------------------------------------------------------
 app.get('/simDiagnosticFile', (req, res) => {
   let sim = JSON.parse(req.query.sim);
+
   let diagPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_diagnostic.bson`;
 
   fs.readFile(diagPath, (err, data) => {
@@ -105,6 +109,7 @@ app.get('/simDiagnosticFile', (req, res) => {
 // --------------------------------------------------------
 app.get('/simMetaFile', (req, res) => {
   let sim = JSON.parse(req.query.sim);
+
   let metaPath = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/_meta.json`;
 
   fs.readFile(metaPath, (err, data) => {
@@ -191,4 +196,9 @@ function BSON_parse(ds) {
     dict[variable_names[i]] = big_array;
   }
   return dict;
+}
+
+Number.prototype.pad = function(size) {
+  var sign = Math.sign(this) === -1 ? '-' : '';
+  return sign + new Array(size).concat([Math.abs(this)]).join('0').slice(-size);
 }

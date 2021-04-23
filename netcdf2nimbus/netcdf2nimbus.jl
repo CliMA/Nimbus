@@ -21,6 +21,9 @@ function get_args()
 		"-n", "--name"
 			help = "simulation identifier."
 			default = "-1"
+		"-d", "--dbName"
+			help = "file name for database file."
+			default = "nimbusDB.json"
 		"--db_add"
 			help = "flag to convert simulation data and recompile database."
 			action = :store_true
@@ -259,9 +262,9 @@ function get_meta_data(vol, parsed_args, core, default, aux=nothing, state=nothi
     return meta_data
 end
 
-function get_geo_data(site_num)
+function get_geo_data(site_num, nimbus_dir)
 	site = parse(Int64, site_num)
-	geo = Dataset("geolocation.nc")
+	geo = Dataset(nimbus_dir * "/netcdf2nimbus" * "/geolocation.nc")
 	site_data = Dict(
 		"lat" =>  geo["lat"][site],
 		"lon" => geo["lon"][site]
@@ -269,10 +272,10 @@ function get_geo_data(site_num)
 	return site_data
 end
 
-function compile_database(output_folder)
+function compile_database(output_folder, nimbus_dir, dbName)
 
-	if isfile("../nimbusDB.json")
-		rm("../nimbusDB.json")
+	if isfile(nimbus_dir * "/" * dbName)
+		rm(nimbus_dir * "/" * dbName)
 	end
 
 	nimbus_data = Dict(
@@ -288,7 +291,7 @@ function compile_database(output_folder)
 		site_data = Dict(
 			# "site_num" => site[end-1:end],
 			"site_num" => site[findfirst("site",site)[end]+1:end],
-			"geocoordinates" => get_geo_data(site[end-1:end]),
+			"geocoordinates" => get_geo_data(site[end-1:end], nimbus_dir),
 			"simulations" => []
 		)
 		sims = sort(readdir(output_folder * "/" * site))
@@ -337,8 +340,17 @@ function main()
 	parsed_args = get_args()
 	handle_arg_errors(parsed_args)
 
+	dbName = parsed_args["dbName"];
+	if !occursin(".json", dbName)
+		dbName = dbName * ".json"
+	end
+
 	println("-----------------------------------------------------------------")
-	output_folder = "../" * parsed_args["output"]
+	nimbus_dir = dirname(Base.source_dir())
+	curr_dir = pwd()
+	
+	output_folder = curr_dir * "/" * parsed_args["output"]
+	
 	if !isdir(output_folder)
 		mkdir(output_folder)
 	end
@@ -431,11 +443,11 @@ function main()
 			for v in volumetric_data
 				t_counter = 1
 				for time_stamp in v
-					folder_name = vfs[counter] * "/t_" * string(t_counter)
+					folder_name = vfs[counter] * "/t_" * lpad(t_counter,4,"0")
 					mkdir(folder_name)
 					a_counter = 1
 					for altitude in time_stamp
-						bson(folder_name * "/set_" * string(a_counter) * ".bson", altitude)
+						bson(folder_name * "/set_" * lpad(a_counter,3,"0") * ".bson", altitude)
 						a_counter+=1
 					end
 					t_counter+=1
@@ -470,10 +482,10 @@ function main()
 	# PHASE 2. COMPILE DATABASE (FOR MODES --db_add and --db_compile)
 	#--------------------------------------
 	if parsed_args["db_compile"] || parsed_args["db_add"]
-		println("Writing nimbusDB.json...")
-		database = compile_database(output_folder)
+		println("Writing " * dbName * "...")
+		database = compile_database(output_folder, nimbus_dir, dbName)
 		nm = JSON.json(database)
-		open("../nimbusDB.json", "w") do x
+		open(nimbus_dir * "/" * dbName, "w") do x
 			write(x, nm)
 		end
 	end

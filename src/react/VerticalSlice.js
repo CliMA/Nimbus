@@ -12,7 +12,7 @@ function VerticalSlice({
   // --------------------------------------------------------
   const [displayedContour, setDisplayedContour] = useState(contour_var);
 
-  const axis_ratio = dims.z / dims.x;
+  const axis_ratio = Number(dims.z / dims.x);
 
   // this variable corresponds to the dimensions of the 2D array for the contour
   // ry corresponds to the desired spatial dimensions
