@@ -35,12 +35,12 @@ export default class SiteSimulationsList extends Component {
   render() {
     return (
       <div className={`site-container ${ this.state.isExpanded ? 'expanded' : '' }`}>
-        <div className='site-header'>
+        <div className='site-header' onClick={ this.toggleExpanded.bind(this) }>
           <span>{ `site${ this.props.siteData['site_num'] }` }</span>
 
           { this.state.isExpanded ? 
-            <svg onClick={ this.toggleExpanded.bind(this) }className='icon-collapse' width="18" height="1" viewBox="0 0 18 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <line y1="0.5" x2="18" y2="0.5" stroke="black"/>
+            <svg onClick={ this.toggleExpanded.bind(this) } className='icon-collapse' width="18" height="1" viewBox="0 0 18 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line y1="0.5" x2="18" y2="0.5" stroke="white"/>
             </svg>
             :
             <svg onClick={ this.toggleExpanded.bind(this) } className='icon-expand' width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">

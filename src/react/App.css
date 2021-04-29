@@ -91,6 +91,10 @@ label.simulation-id-label {
   background: #545766;
 }
 
+.site-header:hover {
+  cursor: pointer;
+}
+
 .header-diag-plots-full {
   height: 4.0vh;
   align-items: center;

@@ -187,20 +187,19 @@ export default class App extends Component {
         <div id='available-datasets'>
           <span>Available Datasets ({ this.state.selectedDatasets.length } selected)</span>
 
-          <svg onClick={ this.toggleUserSettingsModal.bind(this) } id='icon-user-settings'  width="5" height="24" viewBox="0 0 5 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* <svg onClick={ this.toggleUserSettingsModal.bind(this) } id='icon-user-settings'  width="5" height="24" viewBox="0 0 5 18" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M1.90476 11.7071C2.95673 11.7071 3.80952 10.8335 3.80952 9.75591C3.80952 8.67828 2.95673 7.80469 1.90476 7.80469C0.852791 7.80469 0 8.67828 0 9.75591C0 10.8335 0.852791 11.7071 1.90476 11.7071Z" fill="white"/>
             <path d="M1.90476 3.90244C2.95673 3.90244 3.80952 3.02885 3.80952 1.95122C3.80952 0.873591 2.95673 0 1.90476 0C0.852791 0 0 0.873591 0 1.95122C0 3.02885 0.852791 3.90244 1.90476 3.90244Z" fill="white"/>
             <path d="M1.90476 19.5118C2.95673 19.5118 3.80952 18.6382 3.80952 17.5606C3.80952 16.483 2.95673 15.6094 1.90476 15.6094C0.852791 15.6094 0 16.483 0 17.5606C0 18.6382 0.852791 19.5118 1.90476 19.5118Z" fill="white"/>
-          </svg>                  
+          </svg> */}
         </div>
 
         <div id='full-site-list'>
           <ul id='sites-list'>
-            {
-              this.state.dbMetadataList ? this.generateSiteSimulationsList() : null
-            }
+            { this.state.dbMetadataList ? this.generateSiteSimulationsList() : null }
           </ul>
         </div>
+        {/* <div id='add-local-db-btn'>Add local database</div> */}
       </div>
     );
   }
@@ -210,7 +209,7 @@ export default class App extends Component {
   renderDataSelectionView() {
     return (
       <div id='data-selection-container'>
-        { this.renderUserSelectDBLocation() }
+        {/* { this.renderUserSelectDBLocation() } */}
         <div id='data-viewer-header'>
           <span>NIMBUS</span>
         </div>
