@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import Viewer from './Viewer';
 import WorldMap from './WorldMap';
+import Dropdown from './Dropdown';
 import SiteSimulationsList from './SiteSimulationsList';
 import axios from 'axios';
 
@@ -14,10 +15,12 @@ export default class App extends Component {
     this.state = {
       selectedDatasets: [],
       userSettingsModalOpen: false,
-      hasLaunched: false // not being used rn
+      hasLaunched: false, // not being used rn
+
+      // sets inital variable for timeline
+      currentAltVar : 'tke'
     }
   }
-
 
   // --------------------------------------------------------
   componentDidMount() {
@@ -39,7 +42,6 @@ export default class App extends Component {
         });
       });
   }
-
 
   // --------------------------------------------------------
   // For now this requests only one simulation but should be
@@ -124,6 +126,20 @@ export default class App extends Component {
 
 
   // --------------------------------------------------------
+  timeline_vars = [
+    "tke",
+    "cld_frac"
+    // ,"ql"
+  ];
+
+  handleChangeDropdownVar = item => {
+    this.setState({
+      currentAltVar: item
+    })
+  }
+
+
+  // --------------------------------------------------------
   render() {
     return (
       <>
@@ -167,8 +183,17 @@ export default class App extends Component {
               </div>
               <div id='map-view'>
                 <WorldMap
+                  timeline_var ={ this.state.currentAltVar}
                   dbMetadataList={ this.state.dbMetadataList }
+                  selectedDatasets={ this.state.selectedDatasets }
                 />
+                <div id='timeline-var-dropdown'>
+                  <Dropdown
+                    default_var={ this.timeline_vars[0] }
+                    items={ this.timeline_vars }
+                    onChange={ this.handleChangeDropdownVar }
+                  />
+                </div>
                 <button
                   id='btn-launch'
                   onClick={ this.getSimulationData.bind(this) }

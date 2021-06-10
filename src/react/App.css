@@ -132,6 +132,31 @@ label.simulation-id-label {
 #map-view {
   width: 70vw;
   background: #16171d;
+  display: flex;
+  flex-direction: column;
+  align-items:center;
+}
+
+.sim-info {
+  margin-top: 2vw;
+}
+
+.world-map {
+  margin-top: 5vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#timeline-var-dropdown {
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 5px;
+  display: flex;
+  color: white;
+  font-size: 0.75em;
+  align-items: center;
 }
 
 #user-settings-modal {
@@ -150,11 +175,6 @@ label.simulation-id-label {
 #user-settings-modal.visible {
   display: block;
 }
-
-
-
-
-
 
 
 #app-header {

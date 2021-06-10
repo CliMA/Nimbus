@@ -3,6 +3,7 @@ using NetCDF: ncread
 using BSON
 using JSON
 using ArgParse
+using Statistics
 
 # lists to limit variables for testing
 VOLUMETRIC_VARIABLES = ["ρ","ρu[3]","moisture.ρq_tot","moisture.temperature","moisture.θ_v","moisture.q_liq","moisture.q_ice"]
@@ -191,6 +192,8 @@ function get_meta_data(vol, parsed_args, core, default, aux=nothing, state=nothi
     def_vars = keys(Dataset(default))
     def_vars = [var for var in def_vars if var != "time" && var != "z"]
 
+	timeline_vars = ["tke","ql","cld_frac"]
+
     all_diag_vars = vcat(core_vars, def_vars)
 	diag_num_time_stamps = size(Dataset(default)["time"])[1]
 	diag_time_stamps = Dataset(default)["time"]
@@ -244,7 +247,9 @@ function get_meta_data(vol, parsed_args, core, default, aux=nothing, state=nothi
 			"diagnostic_time_stamps" => diag_time_stamps,
 			"diagnostic_duration" => default["time"][end],
 			"diagnostic_altitudes" => default["z"],
-	        "diagnostic_altitude_extent" => default["z"][end]
+	        "diagnostic_altitude_extent" => default["z"][end],
+
+			"timeline_data" => Dict(var => Statistics.mean(default[var], dims=1) for var in timeline_vars)
 	    )
 	else
 		meta_data = Dict(
@@ -256,7 +261,9 @@ function get_meta_data(vol, parsed_args, core, default, aux=nothing, state=nothi
 			"diagnostic_time_stamps" => diag_time_stamps,
 			"diagnostic_duration" => default["time"][end],
 			"diagnostic_altitudes" => default["z"],
-	        "diagnostic_altitude_extent" => default["z"][end]
+	        "diagnostic_altitude_extent" => default["z"][end],
+
+			"timeline_data" => Dict(var => Statistics.mean(default[var], dims=1) for var in timeline_vars)
 	    )
 	end
     return meta_data
@@ -310,7 +317,9 @@ function compile_database(output_folder, nimbus_dir, dbName)
 					"diagnostic_duration" => sim_meta["diagnostic_duration"],
 					"diagnostic_num_time_stamps" => sim_meta["diagnostic_num_time_stamps"],
 					"volumetric_duration" => sim_meta["volumetric_duration"],
-					"volumetric_num_time_stamps" => sim_meta["volumetric_num_time_stamps"]
+					"volumetric_num_time_stamps" => sim_meta["volumetric_num_time_stamps"],
+
+					"timeline_data" => sim_meta["timeline_data"]
 				)
 			else
 				sim_data = Dict(
@@ -318,7 +327,9 @@ function compile_database(output_folder, nimbus_dir, dbName)
 					"vol" => false,
 					"z_extent" => sim_meta["diagnostic_altitude_extent"],
 					"diagnostic_duration" => sim_meta["diagnostic_duration"],
-					"diagnostic_num_time_stamps" => sim_meta["diagnostic_num_time_stamps"]
+					"diagnostic_num_time_stamps" => sim_meta["diagnostic_num_time_stamps"],
+
+					"timeline_data" => sim_meta["timeline_data"]
 				)
 			end
 			push!(site_data["simulations"], sim_data)
