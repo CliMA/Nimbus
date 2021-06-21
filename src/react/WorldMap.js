@@ -1,18 +1,15 @@
-import React, { useEffect, useState, useRef } from 'react';
-import Dropdown from './Dropdown';
+import React, { useEffect, useRef } from 'react';
 
 import land50 from '../assets/land-50m';
 import geolocations from '../assets/geolocations';
-import { active } from 'd3';
-import { render } from 'react-dom';
 
 const topojson = require('topojson');
 const d3 = require('d3');
 
-function WorldMap({ timeline_var, dbMetadataList , selectedDatasets }) {
+function WorldMap({ currentProjection, currentRotation, timeline_var, dbMetadataList , selectedDatasets }) {
 
   const simInfoVar = timeline_var;
-  const projection = d3.geoNaturalEarth1();
+  const projection = currentProjection.rotate([currentRotation,0]);
   // const projection = d3.geoMercator();
   const all_points = Object.keys(geolocations).map(function(key){
     return geolocations[key];
@@ -88,10 +85,10 @@ function WorldMap({ timeline_var, dbMetadataList , selectedDatasets }) {
       let time;
       for (let i=0;i<db['sites'].length;i++) {
         let site = db['sites'][i];
-        if (site['site_num'] == displayed_site_num.toString()) {
+        if (site['site_num'] === displayed_site_num.toString()) {
           for (let j=0;j<site['simulations'].length;j++) {
             let sim = site['simulations'][j];
-            if (sim['sim_id'] == displayed_sim_id) {
+            if (sim['sim_id'] === displayed_sim_id) {
               data = sim['timeline_data'][simInfoVar];
               time = sim['diagnostic_duration'];
             }
@@ -181,8 +178,10 @@ function WorldMap({ timeline_var, dbMetadataList , selectedDatasets }) {
   //   });
   // }
 
-  const width = window.innerWidth * .65;
+  const width = window.innerWidth * .6;
   const height = get_height();
+
+  console.log("dims: " + width + "," + height);
 
   //canvas render for map
 
@@ -238,25 +237,25 @@ function WorldMap({ timeline_var, dbMetadataList , selectedDatasets }) {
       context.fillStyle = "rgba(255, 255, 255, 0.1)";
       context.lineWidth = 1;
       context.fill();
-      context.stroke();
+      // context.stroke();
       context.closePath();
 
       //list_locations
       context.beginPath();
       path(list_locations);
-      context.strokeStyle = "rgba(0, 0, 255, 0.4)";
-      context.fillStyle = "rgba(0, 0, 255, 0.2)";
-      context.lineWidth = 4;
-      context.fill();
+      context.strokeStyle = "rgba(255, 255, 255, 0.6)";
+      context.fillStyle = "rgba(255, 255, 255, 0.5)";
+      context.lineWidth = 3;
+      // context.fill();
       context.stroke();
       context.closePath();
 
       //selected_locations
       context.beginPath();
       path(selected_locations);
-      context.strokeStyle = "rgba(0, 0, 255, 0.4)";
-      context.fillStyle = "rgba(0, 0, 255, 0.2)";
-      context.lineWidth = 12;
+      context.strokeStyle = "rgba(255, 255, 255, 1)";
+      context.fillStyle = "rgba(255, 255, 255, 1)";
+      context.lineWidth = 5;
       context.fill();
       context.stroke();
       context.closePath();

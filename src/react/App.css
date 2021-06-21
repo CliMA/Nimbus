@@ -137,12 +137,42 @@ label.simulation-id-label {
   align-items:center;
 }
 
-.sim-info {
-  margin-top: 2vw;
+#map-controls {
+  margin-top: 4vw;
+  margin-bottom: 2vw;
+  width: 70%;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#map-projection {
+  width: 14vw;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#map-rotation {
+  width: 14vw;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#projection-label {
+  font-size: .7em;
+}
+
+#rotation-label {
+  font-size: .7em;
+}
+
+.globe-projection {
+  margin-bottom: 1vw;
 }
 
 .world-map {
-  margin-top: 5vw;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -411,6 +441,13 @@ label.simulation-id-label {
   color: black;
 }
 
+#projection-center {
+  height: 2px;
+  margin-top: 16px;
+  margin-bottom: 12px;
+  -webkit-appearance: slider-horizontal;
+  background: #d3d3d3;
+}
 
 #scrubber-altitude {
   width: 2px;

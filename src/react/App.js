@@ -6,19 +6,22 @@ import Dropdown from './Dropdown';
 import SiteSimulationsList from './SiteSimulationsList';
 import axios from 'axios';
 
+const d3projections = require('d3-geo-projection');
+
 export default class App extends Component {
 
   // --------------------------------------------------------
   constructor(props) {
     super(props);
-
     this.state = {
       selectedDatasets: [],
       userSettingsModalOpen: false,
       hasLaunched: false, // not being used rn
 
       // sets inital variable for timeline
-      currentAltVar : 'tke'
+      currentAltVar : 'tke',
+      currentMapProj : 'Natural Earth',
+      currentMapCenter : 0
     }
   }
 
@@ -128,13 +131,36 @@ export default class App extends Component {
   // --------------------------------------------------------
   timeline_vars = [
     "tke",
-    "cld_frac"
-    // ,"ql"
+    "cld_frac",
+    "ql"
   ];
 
   handleChangeDropdownVar = item => {
     this.setState({
       currentAltVar: item
+    })
+  }
+
+   // --------------------------------------------------------
+   // add more projections from https://github.com/d3/d3-geo-projection
+   // --------------------------------------------------------
+   map_projections = {
+    "Natural Earth" : d3projections.geoNaturalEarth2(),
+    "Eckert 3" : d3projections.geoEckert3(),
+    "Cylindrical Equial Area" : d3projections.geoCylindricalEqualArea(),
+    "Bromley" : d3projections.geoBromley(),
+    "Aitoff" : d3projections.geoAitoff(),
+  };
+
+  handleChangeDropdownProjection = item => {
+    this.setState({
+      currentMapProj: item
+    })
+  }
+
+  handleLonChange = item => {
+    this.setState({
+      currentMapCenter: item.target.value
     })
   }
 
@@ -182,7 +208,31 @@ export default class App extends Component {
 
               </div>
               <div id='map-view'>
+                <div id='map-controls'>
+                  <div id='map-projection'>
+                  <div id='projection-label'> Projection: </div>
+                  <Dropdown
+                      default_var={ Object.keys(this.map_projections)[0] }
+                      items={ Object.keys(this.map_projections) }
+                      onChange={ this.handleChangeDropdownProjection }
+                    />
+                  </div>
+                <div id= 'map-rotation'>
+                <div id='rotation-label'> Rotation: </div>
+                  <input
+                    id="projection-center"
+                    onChange={ this.handleLonChange }
+                    type="range"
+                    min={ -180 }
+                    value={ this.state.currentMapCenter }
+                    max={ 180 }
+                    step={ 5 }
+                  />
+                </div>
+              </div>
                 <WorldMap
+                  currentProjection = { this.map_projections[this.state.currentMapProj] }
+                  currentRotation = { this.state.currentMapCenter }
                   timeline_var ={ this.state.currentAltVar}
                   dbMetadataList={ this.state.dbMetadataList }
                   selectedDatasets={ this.state.selectedDatasets }
