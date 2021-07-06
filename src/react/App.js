@@ -17,11 +17,34 @@ export default class App extends Component {
     }
   }
 
+  // --------------------------------------------------------
+  // Checks if we are running app inside of Electron
+  // See https://stackoverflow.com/questions/61725325/detect-an-electron-instance-via-javascript
+  isElectron() {
+    // Renderer process
+    if (typeof window !== 'undefined' && typeof window.process === 'object' && window.process.type === 'renderer') {
+      return true;
+    }
+
+    // Main process
+    if (typeof process !== 'undefined' && typeof process.versions === 'object' && !!process.versions.electron) {
+      return true;
+    }
+
+    // Detect the user agent when the `nodeIntegration` option is set to true
+    if (typeof navigator === 'object' && typeof navigator.userAgent === 'string' && navigator.userAgent.indexOf('Electron') >= 0) {
+      return true;
+    }
+
+    return false;
+  }
+
 
   // --------------------------------------------------------
   componentDidMount() {
 
-    axios.get('/dbMetadataList')
+    // if (!this.isElectron()) {
+      axios.get('/dbMetadataList')
       .then(res => {
         this.setState({
           dbMetadataList: res.data
@@ -31,12 +54,17 @@ export default class App extends Component {
         console.log('/dbMetadataList error: ', e);
       });
 
-    axios.get('/userDirectoryPath')
+      axios.get('/userDirectoryPath')
       .then(res => {
         this.setState({
           userDirectory: res.data['user_directory']
         });
       });
+  //   } else {
+  //     console.log('running in electron')
+  //   }
+
+   
   }
 
 

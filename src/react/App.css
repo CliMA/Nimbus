@@ -118,10 +118,24 @@ label.simulation-id-label {
   font-size: 0.9rem;
 }
 
+#btn-launch:hover {
+  cursor: pointer;
+}
+
+#btn-launch:disabled {
+  background: gray;
+  cursor: auto;
+}
+
 #btn-launch {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+	bottom: 20px;
+	right: 20px;
+	padding: 8px 40px;
+	border-radius: 50px;
+  border: none!important;
+  font-family: 'Rubik', sans-serif;
+  background: #a5c1e7;
 }
 
 .simulation-meta {

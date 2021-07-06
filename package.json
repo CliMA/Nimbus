@@ -36,7 +36,7 @@
     "start": "Runs development build on a local web server, frontend on 3000 (create-react-app) and proxied requests to 8080",
     "build": "Runs production build, server runs and serves frontend from 8080",
     "server": "Runs the node server, needs to be run before start script if in development mode",
-    "start-electron": "Runs electron locally, not a build. Must run start script in a separate terminal window before this.",
+    "start-electron": "Runs electron locally, not a build. Must run server and start scripts in separate terminal windows before this.",
     "build-electron": "Creates /electron and /src folders in /build to use for electron package script",
     "package": "Package the code in the build/electron and build/src folders into executables (Mac and Win) outputted in /dist."
   },
