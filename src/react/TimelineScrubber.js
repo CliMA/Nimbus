@@ -6,7 +6,7 @@ import React from 'react';
 // this file handles the timeline scrubber that applies to the slices view
 // --------------------------------------------------------
 function TimelineScrubber({
-  timeStamps, currentTime, timeRange, timeIncrement, handleUpdateTime
+  currentRange, timeStamps, currentTime, timeRange, timeIncrement, handleUpdateTime
 }) {
 
   let emptyTimeArr = [];
@@ -16,10 +16,16 @@ function TimelineScrubber({
 
   // --------------------------------------------------------
   const generateIntervals = () => {
+    console.log('currentRange:', currentRange)
+
     return (
       <div className='sliderticks'>
         {[...Array(timeRange[1] + 1)].map((x, i) =>
-          <div className='tick' key={`tick-${i}`}></div>
+          <div 
+            id={`tick-${i}`} 
+            className={`tick ${ i >= currentRange[0] && i <= currentRange[1] ? 'data-loaded' : ''}`} 
+            key={`tick-${i}`}
+          ><div>{`${i + 1}`}</div></div>
         )}
       </div>
     );
@@ -28,7 +34,7 @@ function TimelineScrubber({
   // --------------------------------------------------------
   const convertToTimestamp = ( index ) => {
     var str = timeStamps[index];
-    console.log(timeStamps);
+    // console.log(timeStamps);
     var t = str.indexOf("T");
     var st = str.slice(t+1,t+9);
 

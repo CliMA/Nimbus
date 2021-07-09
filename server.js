@@ -2,7 +2,6 @@ const express        = require('express');
 const path           = require('path');
 const fs             = require('fs');
 const fse            = require('fs-extra');
-const async          = require('async');
 const app            = express();
 const BSON           = require('bson');
 const PORT           = 8080;
@@ -22,31 +21,41 @@ app.get('/dbMetadataList', (req, res) => {
 });
 
 // --------------------------------------------------------
-/* At time of writing, we were given simulation data with 
-  only two volumetric files. This call needs to be updated
-  later to handle multiple / larger batch calls as desired.
-*/
-// --------------------------------------------------------
 // Return volumetric data for range of timestamps
-app.get('/volDataForTSRange', async (req, res) => {
+app.get('/volDataForTSBatchSize', async (req, res) => {
   let sim         = JSON.parse(req.query.sim);
   let samplingRes = JSON.parse(req.query.samplingRes);
-  let tsRange     = JSON.parse(req.query.tsRange);
-  let tsStarting  = JSON.parse(req.query.tsStarting);
+  let tsBatchSize = JSON.parse(req.query.tsBatchSize);
+  let tsStarting  = JSON.parse(req.query.tsStarting) + 1;
+  let tsNum       = JSON.parse(req.query.tsNum);
 
   let volDir = `${ userPath }/${ sim['site_id'] }/${ sim['sim_id'] }/volumetric/${ samplingRes }x`;
 
-  let tsRangeData = [];
+  let tsBatchData = [];
 
-  // make sure to wait for all timestamps?
-  for (let i = tsStarting; i <= tsRange; i++) {
-    let id = i.pad(4)
-    let tsDir = `${ volDir }/t_${ id }/`
-    const a = await getVolDataForTS(tsDir, i)
-    tsRangeData.push(a);
+  // Make sure to wait for all data
+  let tsMax;
+  if (tsNum - tsStarting < 5) {
+    tsMax = tsNum - tsStarting;
+  } else {
+    tsMax = tsStarting + tsBatchSize - 1
   }
 
-  res.send(tsRangeData);
+  console.log('---------')
+  console.log('tsNum', tsNum);
+  console.log('tsStarting: ',tsStarting);
+  console.log('tsBatchSize: ', tsBatchSize);
+  console.log('tsMax: ', tsMax);
+
+  // make sure to wait for all timestamps?
+  for (let i = tsStarting; i <= tsMax + 1; i++) {
+    let id = i.pad(4)
+    let tsDir = `${ volDir }/t_${ id }/`
+    console.log('tsDir: ', tsDir);
+    const a = await getVolDataForTS(tsDir, i)
+    tsBatchData.push(a);
+  }
+  res.send(tsBatchData);
 })
 
 
@@ -78,7 +87,7 @@ async function getVolDataForTS(tsDir, idx) {
       //   console.log("The file was saved!");
       // }); 
 
-      return allcontent
+      return allcontent;
     });
 }
 
