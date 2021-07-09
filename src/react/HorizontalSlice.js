@@ -4,7 +4,7 @@ import Dropdown from './Dropdown';
 //import legend from './ColorLegend';
 
 function HorizontalSlice({
-  current_time, altitude, contour_var, contour_var_opts,
+  offset, current_time, altitude, contour_var, contour_var_opts,
   boxes_span, positivify, linearColorScale, dims }) {
   // --------------------------------------------------------
   // sets dimensions and displayed variable
@@ -21,13 +21,13 @@ function HorizontalSlice({
 
   const pixelScale = window.innerHeight * 1/h_shape.x * .3;
 
-  console.log(h_shape);
+  // console.log(h_shape);
 
   // --------------------------------------------------------
   // retrieves the arrays for the slices from the 3D data - 'full array' variables are
   // not currently used, but could be in order to change how colors are scaled
   // --------------------------------------------------------
-  const slice_array      = boxes_span[displayedContour][current_time][altitude/z_sample_rate];
+  const slice_array      = boxes_span[displayedContour][current_time - offset][altitude/z_sample_rate];
   const full_array       = boxes_span[displayedContour][0];
   const flat_slice_array = positivify([].concat.apply([], slice_array));
   // const flat_full_array  = positivify([].concat.apply([], ([].concat.apply([], full_array))));

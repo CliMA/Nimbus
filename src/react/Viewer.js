@@ -14,26 +14,28 @@ export default class Viewer extends Component {
     // --------------------------------------------------------
 
 
-    this.state = {
+    if (this.props.hasVolumetricData) {
+      this.state = {
 
-
-      // Horizontal
-      currentSliceType: 'HORIZONTAL',
-      currentAltitude: this.props.simMetaData["z_extent"] / 2,
-
-      // these two can go
-      horizontalSliceRange: [0, this.props.simMetaData["z_extent"]],
-      horizontalIncrement: this.props.simMetaData["z"][1] - this.props.simMetaData["z"][0],
-
-      // Vertical
-      currentVerticalAxis: 'X',
-      currentVerticalX: this.props.simMetaData["x_extent"] / 2,
-      currentVerticalY: this.props.simMetaData["y_extent"] / 2,
-
-      // these two can go
-      verticalSliceRange: [0, this.props.simMetaData["x_extent"]],
-      verticalIncrement: this.props.simMetaData["x"][1] - this.props.simMetaData["x"][0],
+        // Horizontal
+        currentSliceType: 'HORIZONTAL',
+        currentAltitude: this.props.simMetaData["z_extent"] / 2,
+  
+        // these two can go
+        horizontalSliceRange: [0, this.props.simMetaData["z_extent"]],
+        horizontalIncrement: this.props.simMetaData["z"][1] - this.props.simMetaData["z"][0],
+  
+        // Vertical
+        currentVerticalAxis: 'X',
+        currentVerticalX: this.props.simMetaData["x_extent"] / 2,
+        currentVerticalY: this.props.simMetaData["y_extent"] / 2,
+  
+        // these two can go
+        verticalSliceRange: [0, this.props.simMetaData["x_extent"]],
+        verticalIncrement: this.props.simMetaData["x"][1] - this.props.simMetaData["x"][0],
+      }
     }
+    
 
     this.handleUpdateAltitude     = this.handleUpdateAltitude.bind(this);
     this.handleSelectTab          = this.handleSelectTab.bind(this);
@@ -77,33 +79,40 @@ export default class Viewer extends Component {
     return (
       <div className="Viewer">
         {/* Don't render if !this.props.hasVolumetricData*/}
-        <SlicesContainer
+        { this.props.hasVolumetricData ? 
+          <SlicesContainer
+            selectedDatasets={ this.props.selectedDatasets }
+            simMetaData={ this.props.simMetaData }
 
-          selectedDatasets={ this.props.selectedDatasets }
-          simMetaData={ this.props.simMetaData }
+            horizontalSliceRange={ this.state.horizontalSliceRange }
+            horizontalIncrement={ this.state.horizontalIncrement }
+            verticalSliceRange={ this.state.verticalSliceRange }
+            verticalIncrement={ this.state.verticalIncrement }
 
-          horizontalSliceRange={ this.state.horizontalSliceRange }
-          horizontalIncrement={ this.state.horizontalIncrement }
-          verticalSliceRange={ this.state.verticalSliceRange }
-          verticalIncrement={ this.state.verticalIncrement }
+            currentSliceType={ this.state.currentSliceType }
+            currentAltitude={ this.state.currentAltitude }
+            currentVerticalAxis={ this.state.currentVerticalAxis }
+            currentVerticalX={ this.state.currentVerticalX }
+            currentVerticalY={ this.state.currentVerticalY }
 
-          currentSliceType={ this.state.currentSliceType }
-          currentAltitude={ this.state.currentAltitude }
-          currentVerticalAxis={ this.state.currentVerticalAxis }
-          currentVerticalX={ this.state.currentVerticalX }
-          currentVerticalY={ this.state.currentVerticalY }
-
-          handleSelectTab={ this.handleSelectTab }
-          handleUpdateAltitude={ this.handleUpdateAltitude }
-          handleUpdateVerticalX={ this.handleUpdateVerticalX }
-          handleUpdateVerticalY={ this.handleUpdateVerticalY }
-          handleToggleVerticalAxis={ this.handleToggleVerticalAxis }
-
-        />
+            handleSelectTab={ this.handleSelectTab }
+            handleUpdateAltitude={ this.handleUpdateAltitude }
+            handleUpdateVerticalX={ this.handleUpdateVerticalX }
+            handleUpdateVerticalY={ this.handleUpdateVerticalY }
+            handleToggleVerticalAxis={ this.handleToggleVerticalAxis }
+          /> : 
+          <div className='header-diag-plots-full'>
+            <span>
+              { `${ this.props.selectedDatasets[0]['site_id'] }, ${ this.props.selectedDatasets[0]['sim_id'] } `}
+            </span>
+          </div>
+        }
+        
         <DiagnosticPlotsContainer
+          hasVolumetricData={ this.props.hasVolumetricData }
           simMetaData={ this.props.simMetaData }
           simDiagnosticData={ this.props.simDiagnosticData }
-          currentAltitude={ this.state.currentAltitude }
+          currentAltitude={ this.props.hasVolumetricData ? this.props.simMetaData["z_extent"] / 2 : 0 }
         />
       </div>
     );

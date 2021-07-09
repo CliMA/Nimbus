@@ -1,5 +1,6 @@
 {
-  "name": "clima-test",
+  "name": "nimbus-proto",
+  "productName": "NIMBUS – Electron App",
   "version": "0.1.0",
   "private": true,
   "homepage": "./",
@@ -10,6 +11,7 @@
     "bson": "^4.2.2",
     "concurrently": "^5.2.0",
     "d3": "^5.16.0",
+    "d3-geo-projection": "^3.0.0",
     "electron": "^9.4.3",
     "electron-builder": "^22.8.0",
     "electron-is-dev": "^1.2.0",
@@ -18,20 +20,28 @@
     "raw-body": "^2.4.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-globe": "^5.0.2",
     "react-scripts": "3.4.1",
     "three": "^0.124.0",
+    "topojson": "^3",
     "wait-on": "^5.1.0"
   },
   "proxy": "http://localhost:8080",
   "scripts": {
     "start": "export BROWSER=none && react-scripts start",
+    "build": "react-scripts --max_old_space_size=4096 build",
+    "server": "nodemon server.js",
     "start-electron": "export ELECTRON_START_URL=http://localhost:3000 && electron .",
-    "build": "react-scripts --max_old_space_size=8000 build",
     "build-electron": "mkdir build/src && cp -r electron/. build/electron && cp -r src/shared/. build/src/shared",
-    "package": "electron-builder build --mac --win -c.extraMetadata.main=build/electron/main.js --publish never",
-    "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
-    "server": "nodemon server.js"
+    "package": "electron-builder build --mac --win -c.extraMetadata.main=build/electron/main.js --publish never"
+  },
+  "scriptsComments": {
+    "* NOTE *" : "Developed for Mac only at this time. If it is desired to run on Win, need to add additional scripts for that.", 
+    "start": "Runs development build on a local web server, frontend on 3000 (create-react-app) and proxied requests to 8080",
+    "build": "Runs production build, server runs and serves frontend from 8080",
+    "server": "Runs the node server, needs to be run before start script if in development mode",
+    "start-electron": "Runs electron locally, not a build. Must run server and start scripts in separate terminal windows before this.",
+    "build-electron": "Creates /electron and /src folders in /build to use for electron package script",
+    "package": "Package the code in the build/electron and build/src folders into executables (Mac and Win) outputted in /dist."
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -62,5 +72,9 @@
       "repo": "Nimbus",
       "owner": "clima"
     }
+  },
+  "devDependencies": {
+    "electron": "^9.4.4",
+    "electron-builder": "^22.10.5"
   }
 }

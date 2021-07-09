@@ -1,9 +1,11 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+
 const path = require('path');
 const url = require('url');
 const { channels } = require('../src/shared/constants');
 
 let mainWindow;
+
 
 function createWindow () {
   const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -11,6 +13,7 @@ function createWindow () {
     protocol: 'file:',
     slashes: true,
   });
+  
   mainWindow = new BrowserWindow({
     width: 1920,
     height: 1080,
@@ -18,7 +21,12 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
+  
   mainWindow.loadURL(startUrl);
+  
+  // dev tools
+  mainWindow.webContents.openDevTools()
+
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
@@ -44,3 +52,32 @@ ipcMain.on(channels.APP_INFO, (event) => {
     appVersion: app.getVersion(),
   });
 });
+
+
+// const { app, BrowserWindow } = require('electron');
+// const path = require('path');
+// const url = require('url');
+// let mainWindow;
+// function createWindow () {
+//   const startUrl = process.env.ELECTRON_START_URL || url.format({
+//     pathname: path.join(__dirname, '../index.html'),
+//     protocol: 'file:',
+//     slashes: true,
+//   });
+//   mainWindow = new BrowserWindow({ width: 800, height: 600 });
+//   mainWindow.loadURL(startUrl);
+//   mainWindow.on('closed', function () {
+//     mainWindow = null;
+//   });
+// }
+// app.on('ready', createWindow);
+// app.on('window-all-closed', function () {
+//   if (process.platform !== 'darwin') {
+//     app.quit();
+//   }
+// });
+// app.on('activate', function () {
+//   if (mainWindow === null) {
+//     createWindow();
+//   }
+// });

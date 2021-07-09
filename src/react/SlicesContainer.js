@@ -41,13 +41,14 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   constructor(props) {
+  
     super(props);
+    console.log('simmeta: ', this.props.simMetaData)
 
     this.state = {
-      timeStamps: this.props.simMetaData["volumetric_time_stamps"],
-      currentTime: 0,
-      timeRange: [0, this.props.simMetaData["volumetric_time_stamps"].length - 1], // number of files loaded in
-      timeIncrement: 1, // increment for time scrubber
+      currentTime   : 0, // current time for time scrubber
+      tsBatchSize   : this.props.simMetaData["volumetric_num_time_stamps"] > 10 ? 5 : this.props.simMetaData["volumetric_num_time_stamps"],
+      timeIncrement : 1, // increment for time scrubber
     };
 
     this.positivify       = this.positivify.bind(this);
@@ -57,21 +58,41 @@ export default class SlicesContainer extends Component {
   // --------------------------------------------------------
   componentDidMount() {
 
-    axios.get('/volDataForTSRange', {
+    // Default call for timestamp data starting at first timestamp
+    this.getDataForTimestamps(0);
+  }
+
+  // --------------------------------------------------------
+  // Retrieves data for timestamps starting at ts until 
+  // ts + tsBatchSize - 1, e.g., starting at 4 with batch size of 5 
+  // should be data for [4, 5, 6, 7, 8]
+  getDataForTimestamps(ts) {
+    console.log(ts);
+    this.setState({
+      boxes: null
+    });
+
+    return axios.get('/volDataForTSBatchSize', {
       params: {
         sim: this.props.selectedDatasets[0],
+        tsNum: this.props.simMetaData["volumetric_num_time_stamps"],
         samplingRes: this.data_resolution,
-        tsRange: this.props.simMetaData["volumetric_time_stamps"].length,
-        tsStarting: 1  
+        tsBatchSize: this.state.tsBatchSize,
+        tsStarting: ts
       }
     }).then(res => {
-      // this.boxes = this.compile_vol_data(res);
-      // console.log(this.boxes);
-      this.setState({
-        boxes: this.compile_vol_data(res)
-      });
+      console.log(res);
+      this.setState(
+        {
+          currentRange: [ ts, ts + this.state.tsBatchSize - 1],
+          boxes: this.compile_vol_data(res)
+        },
+        () => {
+          console.log('done setting boxes')
+        }
+      )
     }).catch(e => {
-      console.log('/volDataForTSRange error: ', e);
+      console.log('/volDataForTSBatchSize error: ', e);
     });
   }
 
@@ -109,17 +130,70 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   handleUpdateTime = (e) => {
-    this.setState({ currentTime: parseInt(e.target.value) });
+    console.log('[ handleUpdateTime ] called')
+    let parsedSelectedTime = parseInt(e.target.value);
+    let numVolTS = this.props.simMetaData["volumetric_num_time_stamps"];
+
+    console.log('parsedSelectedTime: ', parsedSelectedTime);
+  
+    this.setState({
+      currentTime: parsedSelectedTime
+    });
+
+    // if we loaded all data (less than 10 timestamps)
+
+    if (this.state.tsBatchSize === numVolTS) {
+      this.setState({ currentTime: parsedSelectedTime });
+    } else {
+      // if we are out of range, make a call for new data
+      if (
+        (parsedSelectedTime) < this.state.currentRange[0]  ||
+        (parsedSelectedTime) > this.state.currentRange[1]
+      ) {
+
+        console.log('out of range: ', parsedSelectedTime);
+        
+        // If we're in the first 5 time stamps
+        if (parsedSelectedTime < 5) {
+          this.getDataForTimestamps(0)
+            .then(() => {
+              this.setState({ currentTime: parsedSelectedTime });
+            });
+        // if we're within 3 of the last time stamp
+        } else if (parsedSelectedTime > numVolTS - this.state.tsBatchSize/2 - 1) {
+          console.log('nearing the end');
+          this.getDataForTimestamps(numVolTS - this.state.tsBatchSize - 1)
+            .then(() => {
+              this.setState({ currentTime: parsedSelectedTime });
+            })
+        // if we're somewhere in the middle
+        } else {
+          this.getDataForTimestamps(parsedSelectedTime - 2)
+            .then(() => {
+              this.setState({ currentTime: parsedSelectedTime });
+            })
+        }
+        
+      } else {
+        // we're not out of range, just update the time
+        this.setState({ currentTime: parsedSelectedTime });
+      }
+    }
+
+  };
+
+  backToHome = () => {
+    window.location.reload();
   };
 
   // --------------------------------------------------------
   renderHeader() {
     return <div className='section-header simulation-header'>
       {/* Globe icon */}
-      <svg className='globe-icon-svg' width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9.99994 0C4.48094 0 0 4.4809 0 9.99992C0 15.4242 4.32942 19.8396 9.71768 19.9898C9.81036 19.9992 9.90552 19.9998 9.99994 19.9998C10.0944 19.9998 10.1895 19.9998 10.2822 19.9898C15.6705 19.8396 19.9999 15.4242 19.9999 9.99992C19.9999 4.4809 15.5189 0 9.99994 0ZM9.67736 0.675419V5.48384H6.05841C6.2768 4.67487 6.54631 3.9335 6.86486 3.29637C7.63321 1.75967 8.63024 0.833966 9.67736 0.675419ZM10.3225 0.675419C11.3696 0.833966 12.3666 1.75967 13.135 3.29637C13.4536 3.9335 13.7231 4.67487 13.9415 5.48384H10.3225V0.675419ZM7.8326 0.907252C7.24296 1.42754 6.72173 2.14112 6.29028 3.00401C5.92735 3.72985 5.62864 4.57239 5.39313 5.48384H1.80444C3.06021 3.21027 5.23845 1.52222 7.8326 0.907252ZM12.1673 0.907252C14.7614 1.52222 16.9397 3.21027 18.1954 5.48384H14.6067C14.3712 4.57239 14.0725 3.72985 13.7096 3.00401C13.2781 2.14112 12.7569 1.42754 12.1673 0.907252ZM1.48186 6.12899H5.23184C4.99687 7.22792 4.86916 8.42288 4.84874 9.67734H0.655222C0.698738 8.41498 0.986994 7.21583 1.48186 6.12899V6.12899ZM5.89712 6.12899H9.67736V9.67734H5.4939C5.51519 8.41488 5.65471 7.21696 5.89712 6.12899ZM10.3225 6.12899H14.1028C14.3452 7.21696 14.4846 8.41488 14.506 9.67734H10.3225V6.12899ZM14.768 6.12899H18.518C19.0129 7.21583 19.3011 8.41498 19.3447 9.67734H15.1511C15.1308 8.42288 15.003 7.22792 14.768 6.12899ZM0.655222 10.3225H4.84874C4.86907 11.5742 4.9979 12.7759 5.23184 13.8709H1.48186C0.988413 12.7843 0.697802 11.5841 0.655222 10.3225V10.3225ZM5.4939 10.3225H9.67736V13.8709H5.89712C5.65448 12.7844 5.51513 11.5858 5.4939 10.3225ZM10.3225 10.3225H14.506C14.4847 11.5858 14.3454 12.7844 14.1028 13.8709H10.3225V10.3225ZM15.1511 10.3225H19.3447C19.3021 11.5841 19.0115 12.7843 18.518 13.8709H14.768C15.002 12.7759 15.1309 11.5742 15.1511 10.3225ZM1.80444 14.516H5.39313C5.62871 15.4263 5.92709 16.2595 6.29028 16.9858C6.72396 17.8532 7.24928 18.5794 7.84269 19.1027C5.24142 18.489 3.06108 16.7963 1.80444 14.516V14.516ZM6.05841 14.516H9.67736V19.3346C8.63024 19.1745 7.63321 18.2302 6.86486 16.6935C6.54631 16.0563 6.2768 15.3232 6.05841 14.516ZM10.3225 14.516H13.9415C13.7231 15.3232 13.4536 16.0563 13.135 16.6935C12.3666 18.2302 11.3696 19.1745 10.3225 19.3346V14.516ZM14.6067 14.516H18.1954C16.9388 16.7963 14.7585 18.489 12.1572 19.1027C12.7506 18.5794 13.2759 17.8532 13.7096 16.9858C14.0728 16.2595 14.3712 15.4263 14.6067 14.516V14.516Z" fill="#ECECEC"/>
-      </svg>
-      <span className='section-header-label'>LES</span>
+        <svg onClick = { this.backToHome } className='globe-icon-svg' width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" >
+          <path d="M9.99994 0C4.48094 0 0 4.4809 0 9.99992C0 15.4242 4.32942 19.8396 9.71768 19.9898C9.81036 19.9992 9.90552 19.9998 9.99994 19.9998C10.0944 19.9998 10.1895 19.9998 10.2822 19.9898C15.6705 19.8396 19.9999 15.4242 19.9999 9.99992C19.9999 4.4809 15.5189 0 9.99994 0ZM9.67736 0.675419V5.48384H6.05841C6.2768 4.67487 6.54631 3.9335 6.86486 3.29637C7.63321 1.75967 8.63024 0.833966 9.67736 0.675419ZM10.3225 0.675419C11.3696 0.833966 12.3666 1.75967 13.135 3.29637C13.4536 3.9335 13.7231 4.67487 13.9415 5.48384H10.3225V0.675419ZM7.8326 0.907252C7.24296 1.42754 6.72173 2.14112 6.29028 3.00401C5.92735 3.72985 5.62864 4.57239 5.39313 5.48384H1.80444C3.06021 3.21027 5.23845 1.52222 7.8326 0.907252ZM12.1673 0.907252C14.7614 1.52222 16.9397 3.21027 18.1954 5.48384H14.6067C14.3712 4.57239 14.0725 3.72985 13.7096 3.00401C13.2781 2.14112 12.7569 1.42754 12.1673 0.907252ZM1.48186 6.12899H5.23184C4.99687 7.22792 4.86916 8.42288 4.84874 9.67734H0.655222C0.698738 8.41498 0.986994 7.21583 1.48186 6.12899V6.12899ZM5.89712 6.12899H9.67736V9.67734H5.4939C5.51519 8.41488 5.65471 7.21696 5.89712 6.12899ZM10.3225 6.12899H14.1028C14.3452 7.21696 14.4846 8.41488 14.506 9.67734H10.3225V6.12899ZM14.768 6.12899H18.518C19.0129 7.21583 19.3011 8.41498 19.3447 9.67734H15.1511C15.1308 8.42288 15.003 7.22792 14.768 6.12899ZM0.655222 10.3225H4.84874C4.86907 11.5742 4.9979 12.7759 5.23184 13.8709H1.48186C0.988413 12.7843 0.697802 11.5841 0.655222 10.3225V10.3225ZM5.4939 10.3225H9.67736V13.8709H5.89712C5.65448 12.7844 5.51513 11.5858 5.4939 10.3225ZM10.3225 10.3225H14.506C14.4847 11.5858 14.3454 12.7844 14.1028 13.8709H10.3225V10.3225ZM15.1511 10.3225H19.3447C19.3021 11.5841 19.0115 12.7843 18.518 13.8709H14.768C15.002 12.7759 15.1309 11.5742 15.1511 10.3225ZM1.80444 14.516H5.39313C5.62871 15.4263 5.92709 16.2595 6.29028 16.9858C6.72396 17.8532 7.24928 18.5794 7.84269 19.1027C5.24142 18.489 3.06108 16.7963 1.80444 14.516V14.516ZM6.05841 14.516H9.67736V19.3346C8.63024 19.1745 7.63321 18.2302 6.86486 16.6935C6.54631 16.0563 6.2768 15.3232 6.05841 14.516ZM10.3225 14.516H13.9415C13.7231 15.3232 13.4536 16.0563 13.135 16.6935C12.3666 18.2302 11.3696 19.1745 10.3225 19.3346V14.516ZM14.6067 14.516H18.1954C16.9388 16.7963 14.7585 18.489 12.1572 19.1027C12.7506 18.5794 13.2759 17.8532 13.7096 16.9858C14.0728 16.2595 14.3712 15.4263 14.6067 14.516V14.516Z" fill="#ECECEC" /> 
+        </svg>
+        <span className='section-header-label'>{ `${ this.props.selectedDatasets[0]['site_id'] }, ${ this.props.selectedDatasets[0]['sim_id'] } `}</span>
     </div>
   }
 
@@ -143,11 +217,11 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   renderCurrentSliceView() {
-    console.log('[ renderCurrentSliceView ] boxes: ', this.state.boxes);
     if (this.props.currentSliceType === 'HORIZONTAL') {
       return (
         <div className='slice-container-inner'>
           <HorizontalSlice
+            offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
             current_time={ this.state.currentTime }
             altitude={ this.props.currentAltitude }
             contour_var={ this.var_opts[0] }
@@ -159,6 +233,7 @@ export default class SlicesContainer extends Component {
           />
 
           <HorizontalSlice
+            offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
             current_time={ this.state.currentTime }
             altitude={ this.props.currentAltitude }
             contour_var={ this.var_opts[0] }
@@ -170,6 +245,7 @@ export default class SlicesContainer extends Component {
           />
 
           <HorizontalSlice
+            offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
             current_time={ this.state.currentTime }
             altitude={ this.props.currentAltitude }
             contour_var={ this.var_opts[0] }
@@ -190,6 +266,7 @@ export default class SlicesContainer extends Component {
           currentVerticalX={ this.props.currentVerticalX }
           currentVerticalY={ this.props.currentVerticalY }
           current_time={ this.state.currentTime }
+          offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
           contour_var={ this.var_opts[0] }
           contour_var_opts={ this.var_opts }
           boxes_span={ this.state.boxes }
@@ -203,6 +280,7 @@ export default class SlicesContainer extends Component {
           currentVerticalX={ this.props.currentVerticalX }
           currentVerticalY={ this.props.currentVerticalY }
           current_time={ this.state.currentTime }
+          offset={ this.state.currentTime > 4 ? this.state.currentRange[0]: 0 }
           contour_var={ this.var_opts[0] }
           contour_var_opts={ this.var_opts }
           boxes_span={ this.state.boxes }
@@ -305,7 +383,8 @@ export default class SlicesContainer extends Component {
 
   // --------------------------------------------------------
   render() {
-    //console.log(this.props);
+    console.log('currentRange: ', this.state.currentRange);
+    console.log('currentTime: '+ this.state.currentTime);
     return (
       <div id='slices-container'>
         {/* COLUMNS */}
@@ -322,20 +401,16 @@ export default class SlicesContainer extends Component {
           </div>
 
           <div id='slices-container-inner' className='slice-column'>
-            <div className='icon-container' id='expand-collapse-slices'>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" clipRule="evenodd" d="M18.4145 19.1958L12.1534 19.1965C11.8451 19.1957 11.5952 19.4457 11.596 19.754C11.596 20.0614 11.8451 20.3106 12.1534 20.3114H19.7539C19.9021 20.3114 20.0432 20.2522 20.1481 20.1474C20.2521 20.0433 20.3113 19.9022 20.3113 19.754V12.1535C20.3113 11.999 20.2482 11.8602 20.1473 11.7593C20.0464 11.6584 19.9076 11.5953 19.7539 11.5961C19.4456 11.5953 19.1957 11.8452 19.1964 12.1535V18.4011L12.8633 12.068C12.754 11.9587 12.6113 11.9052 12.4686 11.9052C12.3258 11.9052 12.1831 11.9587 12.075 12.068C11.8564 12.2854 11.8564 12.6389 12.075 12.8563L18.4145 19.1958ZM1.89669 1.11554L8.15779 1.11484C8.46606 1.11563 8.716 0.865695 8.71521 0.557419C8.71521 0.249932 8.46606 0.000788444 8.15779 0H0.557337C0.409111 0 0.267982 0.0591324 0.16312 0.163993C0.0590477 0.268066 -8.39233e-05 0.409195 -8.39233e-05 0.557419V8.15787C-8.39233e-05 8.31241 0.0629921 8.45117 0.16391 8.55209C0.26483 8.65301 0.403593 8.71608 0.557337 8.71529C0.865612 8.71608 1.11554 8.46615 1.11475 8.15787V1.91023L7.44792 8.24339C7.55719 8.35266 7.69991 8.40618 7.84263 8.40618C7.98535 8.40618 8.12807 8.35266 8.23623 8.24339C8.45477 8.02597 8.45477 7.67251 8.23623 7.45508L1.89669 1.11554Z" fill="white"/>
-              </svg>
-            </div>
 
             {/* Current slice view */}
             { this.state.boxes ? this.renderCurrentSliceView() : null }
             { 
               this.state.boxes ? 
               <TimelineScrubber
-                timeStamps = { this.state.timeStamps }
+                currentRange={ this.state.currentRange }
+                timeStamps = { this.props.simMetaData["volumetric_time_stamps"] }
                 currentTime={ this.state.currentTime }
-                timeRange={ this.state.timeRange }
+                timeRange={ [0, this.props.simMetaData["volumetric_time_stamps"].length - 1] }
                 timeIncrement={ this.state.timeIncrement }
                 handleUpdateTime={ this.handleUpdateTime }
               /> : 

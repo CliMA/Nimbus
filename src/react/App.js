@@ -2,27 +2,57 @@ import React, { Component } from 'react';
 import './App.css';
 import Viewer from './Viewer';
 import WorldMap from './WorldMap';
+import Dropdown from './Dropdown';
 import SiteSimulationsList from './SiteSimulationsList';
 import axios from 'axios';
+
+const d3projections = require('d3-geo-projection');
 
 export default class App extends Component {
 
   // --------------------------------------------------------
   constructor(props) {
     super(props);
-
     this.state = {
       selectedDatasets: [],
       userSettingsModalOpen: false,
-      hasLaunched: false // not being used rn
+      hasLaunched: false, // not being used rn
+
+      // sets inital variable for timeline
+      currentAltVar : 'tke',
+      currentMapProj : 'Natural Earth',
+      currentMapCenter : 0
     }
+  }
+
+  // --------------------------------------------------------
+  // Checks if we are running app inside of Electron
+  // See https://stackoverflow.com/questions/61725325/detect-an-electron-instance-via-javascript
+  isElectron() {
+    // Renderer process
+    if (typeof window !== 'undefined' && typeof window.process === 'object' && window.process.type === 'renderer') {
+      return true;
+    }
+
+    // Main process
+    if (typeof process !== 'undefined' && typeof process.versions === 'object' && !!process.versions.electron) {
+      return true;
+    }
+
+    // Detect the user agent when the `nodeIntegration` option is set to true
+    if (typeof navigator === 'object' && typeof navigator.userAgent === 'string' && navigator.userAgent.indexOf('Electron') >= 0) {
+      return true;
+    }
+
+    return false;
   }
 
 
   // --------------------------------------------------------
   componentDidMount() {
 
-    axios.get('/dbMetadataList')
+    // if (!this.isElectron()) {
+      axios.get('/dbMetadataList')
       .then(res => {
         this.setState({
           dbMetadataList: res.data
@@ -32,14 +62,16 @@ export default class App extends Component {
         console.log('/dbMetadataList error: ', e);
       });
 
-    axios.get('/userDirectoryPath')
+      axios.get('/userDirectoryPath')
       .then(res => {
         this.setState({
           userDirectory: res.data['user_directory']
         });
       });
+  //   } else {
+  //     console.log('running in electron')
+  //   }
   }
-
 
   // --------------------------------------------------------
   // For now this requests only one simulation but should be
@@ -75,7 +107,6 @@ export default class App extends Component {
     });
   }
   
-
 
   // --------------------------------------------------------
   generateSiteSimulationsList() {
@@ -124,60 +155,196 @@ export default class App extends Component {
 
 
   // --------------------------------------------------------
+  timeline_vars = [
+    "tke",
+    "cld_frac",
+    "ql"
+  ];
+
+  handleChangeDropdownVar = item => {
+    this.setState({
+      currentAltVar: item
+    })
+  }
+
+   // --------------------------------------------------------
+   // add more projections from https://github.com/d3/d3-geo-projection
+   // --------------------------------------------------------
+   map_projections = {
+    "Natural Earth" : d3projections.geoNaturalEarth2(),
+    "Eckert 3" : d3projections.geoEckert3(),
+    "Cylindrical Equial Area" : d3projections.geoCylindricalEqualArea(),
+    "Bromley" : d3projections.geoBromley(),
+    "Aitoff" : d3projections.geoAitoff(),
+  };
+
+  handleChangeDropdownProjection = item => {
+    this.setState({
+      currentMapProj: item
+    })
+  }
+
+  handleLonChange = item => {
+    this.setState({
+      currentMapCenter: item.target.value
+    })
+  }
+  // Only handles when a new one has been selected from file, 
+  // browser, has not yet been 'confirmed' by user
+  onChangeDBFile = (e) => {
+    console.log('here');
+    e.stopPropagation();
+    e.preventDefault();
+    let file = e.target.files[0];
+    console.log(file);
+    // this.setState({file}); /// if you want to upload latter
+  }
+
+
+  // --------------------------------------------------------
+  renderUserSelectDBLocation() {
+    return (
+      <>
+        <div id='user-settings-darken' className={ this.state.userSettingsModalOpen ? 'visible' : '' }></div>
+        <div id='user-settings-modal' className={ this.state.userSettingsModalOpen ? 'visible' : '' }>
+          <div id='user-settings-header'>
+            <span>Settings</span>
+            
+            <div 
+              id='icon-settings-close-container'
+              onClick={ () => this.toggleUserSettingsModal() }
+            >
+              <svg id='icon-settings-close' width="74" height="74" viewBox="0 0 74 74" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M68.3999 1.59922L39.0999 30.8992C37.8999 32.0992 35.9999 32.0992 34.8999 30.8992L5.5999 1.59922C4.3999 0.399219 2.4999 0.399219 1.3999 1.59922C0.199902 2.79922 0.199902 4.69922 1.3999 5.79922L30.6999 35.0992C31.8999 36.2992 31.8999 38.1992 30.6999 39.2992L1.2999 68.6992C0.0999023 69.8992 0.0999023 71.7992 1.2999 72.8992C2.4999 74.0992 4.3999 74.0992 5.4999 72.8992L34.7999 43.5992C35.9999 42.3992 37.8999 42.3992 38.9999 43.5992L68.3999 72.9992C69.5999 74.1992 71.4999 74.1992 72.5999 72.9992C73.7999 71.7992 73.7999 69.8992 72.5999 68.7992L43.3999 39.3992C42.1999 38.1992 42.1999 36.2992 43.3999 35.1992L72.6999 5.89922C73.8999 4.69922 73.8999 2.79922 72.6999 1.69922C71.4999 0.499218 69.5999 0.499219 68.3999 1.59922Z" fill="white"/>
+              </svg>
+            </div>
+            
+          </div>
+          <div id='user-db-container'>
+            <span>Database location:</span>
+            <div id='user-db-path-container'>
+              <span id='user-db-path'>
+                { this.state.userDirectory }
+              </span>
+            </div>
+            <div id='user-db-update-container'>
+              {/* <button>Update</button> */}
+              <form>
+                <input 
+                  type="file" 
+                  id="db-file" 
+                  onChange={ this.onChangeDBFile.bind(this) }
+                  multiple required 
+                />
+                <label id='select-db' htmlFor="db-file">Choose database file</label>
+                <div id="db-filename"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+
+  // --------------------------------------------------------
+  renderAvailableSimulationsList() {
+    return (
+      <div id='dataset-list-view'>
+        <div id='available-datasets'>
+          <span>Available Datasets ({ this.state.selectedDatasets.length } selected)</span>
+
+          {/* <svg onClick={ this.toggleUserSettingsModal.bind(this) } id='icon-user-settings'  width="5" height="24" viewBox="0 0 5 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1.90476 11.7071C2.95673 11.7071 3.80952 10.8335 3.80952 9.75591C3.80952 8.67828 2.95673 7.80469 1.90476 7.80469C0.852791 7.80469 0 8.67828 0 9.75591C0 10.8335 0.852791 11.7071 1.90476 11.7071Z" fill="white"/>
+            <path d="M1.90476 3.90244C2.95673 3.90244 3.80952 3.02885 3.80952 1.95122C3.80952 0.873591 2.95673 0 1.90476 0C0.852791 0 0 0.873591 0 1.95122C0 3.02885 0.852791 3.90244 1.90476 3.90244Z" fill="white"/>
+            <path d="M1.90476 19.5118C2.95673 19.5118 3.80952 18.6382 3.80952 17.5606C3.80952 16.483 2.95673 15.6094 1.90476 15.6094C0.852791 15.6094 0 16.483 0 17.5606C0 18.6382 0.852791 19.5118 1.90476 19.5118Z" fill="white"/>
+          </svg> */}
+        </div>
+
+        <div id='full-site-list'>
+          <ul id='sites-list'>
+            { this.state.dbMetadataList ? this.generateSiteSimulationsList() : null }
+          </ul>
+        </div>
+        {/* <div id='add-local-db-btn'>Add local database</div> */}
+      </div>
+    );
+  }
+
+
+  // --------------------------------------------------------
+  renderDataSelectionView() {
+    return (
+      <div id='data-selection-container'>
+        {/* { this.renderUserSelectDBLocation() } */}
+        <div id='data-viewer-header'>
+          <span>NIMBUS</span>
+        </div>
+        <div id='data-viewer-container'>
+          { this.renderAvailableSimulationsList() }
+          <div id='map-view'>
+            <div id='map-controls'>
+              <div id='map-projection'>
+              <div id='projection-label'> Projection: </div>
+              <Dropdown
+                  default_var={ Object.keys(this.map_projections)[0] }
+                  items={ Object.keys(this.map_projections) }
+                  onChange={ this.handleChangeDropdownProjection }
+                />
+              </div>
+            <div id= 'map-rotation'>
+            <div id='rotation-label'> Rotation: </div>
+              <input
+                id="projection-center"
+                onChange={ this.handleLonChange }
+                type="range"
+                min={ -180 }
+                value={ this.state.currentMapCenter }
+                max={ 180 }
+                step={ 5 }
+              />
+            </div>
+          </div>
+            <WorldMap
+              currentProjection = { this.map_projections[this.state.currentMapProj] }
+              currentRotation = { this.state.currentMapCenter }
+              timeline_var ={ this.state.currentAltVar}
+              dbMetadataList={ this.state.dbMetadataList }
+              selectedDatasets={ this.state.selectedDatasets }
+            />
+            <div id='timeline-var-dropdown'>
+              <Dropdown
+                default_var={ this.timeline_vars[0] }
+                items={ this.timeline_vars }
+                onChange={ this.handleChangeDropdownVar }
+              />
+            </div>
+            <button
+              id='btn-launch'
+              onClick={ this.getSimulationData.bind(this) }
+              disabled={ this.state.selectedDatasets.length > 0 ? false : true }>
+                Launch
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // --------------------------------------------------------
   render() {
     return (
       <>
         {
           this.state.simMetaData && this.state.simDiagnosticData ?
-            <Viewer
-              selectedDatasets={ this.state.selectedDatasets }
-              simDiagnosticData={ this.state.simDiagnosticData }
-              simMetaData={ this.state.simMetaData }
-              simDiagnosticBSON={ this.state.simDiagnosticBSON }
-              hasVolumetricData= { this.state.simMetaData["vol"] }
-            /> :
-          <div id='data-selection-container'>
-            <div id='user-settings-modal' className={ this.state.userSettingsModalOpen ? 'visible' : '' }>
-              <span>User directory:</span>
-              <div id='user-directory-container'>
-                <span>{ this.state.userDirectory }</span>
-              </div>
-            </div>
-            <div id='data-viewer-header'>
-              <span>NIMBUS</span>
-            </div>
-            <div id='data-viewer-container'>
-              <div id='dataset-list-view'>
-
-                <div id='available-datasets'>
-                  <span>Available Datasets ({ this.state.selectedDatasets.length } selected)</span>
-                  <svg onClick={ this.toggleUserSettingsModal.bind(this) }id='icon-user-settings' width="24" height="24" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M25.2345 10.4711L22.3365 9.97897C22.1724 9.45952 21.9537 8.9674 21.7077 8.47529L23.4027 6.09674C23.6488 5.74132 23.6215 5.24921 23.3207 4.94848L20.9968 2.62461C20.6961 2.32387 20.204 2.26919 19.8486 2.54259L17.47 4.23764C17.0053 3.99159 16.4858 3.77287 15.9664 3.60883L15.5016 0.73817C15.4196 0.300736 15.0641 0 14.6267 0H11.346C10.9085 0 10.5531 0.300736 10.4711 0.73817L9.97897 3.63617C9.45952 3.80021 8.9674 4.01893 8.47529 4.26498L6.09674 2.56993C5.74132 2.32387 5.24921 2.35121 4.94848 2.65195L2.62461 4.97582C2.32387 5.27655 2.26919 5.76866 2.54259 6.12408L4.23764 8.50263C3.99159 8.9674 3.77287 9.48686 3.60883 10.0063L0.73817 10.4711C0.300736 10.5531 0 10.9085 0 11.346V14.6267C0 15.0641 0.300736 15.4196 0.73817 15.5016L3.63617 15.9937C3.80021 16.5131 4.01893 17.0053 4.26498 17.4974L2.56993 19.8759C2.32387 20.2313 2.35121 20.7234 2.65195 21.0242L4.97582 23.3481C5.27655 23.6488 5.76866 23.7035 6.12408 23.4301L8.50263 21.735C8.9674 21.9811 9.48686 22.1998 10.0063 22.3638L10.4984 25.2618C10.5804 25.6993 10.9359 26 11.3733 26H14.654C15.0915 26 15.4469 25.6993 15.5289 25.2618L15.9937 22.3365C16.5131 22.1724 17.0053 21.9537 17.4974 21.7077L19.8759 23.4027C20.2313 23.6488 20.7234 23.6215 21.0242 23.3207L23.3481 20.9968C23.6488 20.6961 23.7035 20.204 23.4301 19.8486L21.735 17.47C21.9811 17.0053 22.1998 16.4858 22.3638 15.9664L25.2618 15.4742C25.6993 15.3922 26 15.0368 26 14.5994V11.346C25.9727 10.9085 25.6719 10.5531 25.2345 10.4711ZM12.9863 17.6614C10.3891 17.6614 8.31125 15.5563 8.31125 12.9863C8.31125 10.3891 10.4164 8.31125 12.9863 8.31125C15.5563 8.31125 17.6614 10.3891 17.6614 12.9863C17.6614 15.5836 15.5836 17.6614 12.9863 17.6614Z" fill="black"/>
-                  </svg>
-                </div>
-
-                <div id='full-site-list'>
-                  <ul id='sites-list'>
-                    {
-                      this.state.dbMetadataList ? this.generateSiteSimulationsList() : null
-                    }
-                  </ul>
-                </div>
-
-              </div>
-              <div id='map-view'>
-                <WorldMap
-                  dbMetadataList={ this.state.dbMetadataList }
-                />
-                <button
-                  id='btn-launch'
-                  onClick={ this.getSimulationData.bind(this) }
-                  disabled={ this.state.selectedDatasets.length > 0 ? false : true }>
-                    Launch
-                </button>
-              </div>
-            </div>
-          </div>
+          <Viewer
+            selectedDatasets={ this.state.selectedDatasets }
+            simDiagnosticData={ this.state.simDiagnosticData }
+            simMetaData={ this.state.simMetaData }
+            simDiagnosticBSON={ this.state.simDiagnosticBSON }
+            hasVolumetricData= { this.state.simMetaData["vol"] }
+          /> :
+          this.renderDataSelectionView()
         }
       </>
     )
